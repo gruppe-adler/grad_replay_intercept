@@ -1,0 +1,52 @@
+﻿{
+    "configurations": [
+        {
+            "name": "x64-Debug",
+            "generator": "Ninja",
+            "configurationType": "Debug",
+            "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+            "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "-v",
+            "ctestCommandArgs": "",
+            "cmakeToolchain": "H:/CPPLibs/vcpkg/scripts/buildsystems/vcpkg.cmake",
+            "inheritEnvironments": [ "msvc_x64_x64" ],
+            "variables": [
+                {
+                    "name": "VCPKG_TARGET_TRIPLET",
+                    "value": "x64-windows-static",
+                    "type": "STRING"
+                },
+                {
+                    "name": "USE_64BIT_BUILD",
+                    "value": "True",
+                    "type": "STRING"
+                }
+            ]
+        },
+        {
+            "name": "x64-Release",
+            "generator": "Ninja",
+            "configurationType": "Release",
+            "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+            "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "-v",
+            "ctestCommandArgs": "",
+            "cmakeToolchain": "H:/CPPLibs/vcpkg/scripts/buildsystems/vcpkg.cmake",
+            "inheritEnvironments": [ "msvc_x64_x64" ],
+            "variables": [
+                {
+                    "name": "VCPKG_TARGET_TRIPLET",
+                    "value": "x64-windows-static",
+                    "type": "STRING"
+                },
+                {
+                    "name": "USE_64BIT_BUILD",
+                    "value": "True",
+                    "type": "STRING"
+                }
+            ]
+        }
+    ]
+}
