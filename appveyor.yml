@@ -18,7 +18,7 @@ before_build:
   - mkdir build
   - mkdir vcproj64
   - cd vcproj64
-  - cmake .. -G "Visual Studio 15 2017 Win64" -DUSE_64BIT_BUILD=ON -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/tools/prebuild/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
+  - cmake .. -G "Visual Studio 15 2017 Win64" -DUSE_64BIT_BUILD=ON -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/tools/prebuild/vcpkg-export-20190519-024108/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
   - cd ..
 
 build:
