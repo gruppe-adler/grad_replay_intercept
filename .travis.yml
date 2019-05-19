@@ -9,6 +9,7 @@ addons:
       - gcc-7-multilib
       - g++-7
       - g++-7-multilib
+      - p7zip-full
 install:
   - CXX=g++-7 CC=gcc-7
   - mkdir -p $HOME/deps
