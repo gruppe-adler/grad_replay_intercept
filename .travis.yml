@@ -3,40 +3,32 @@ language: cpp
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
+      - ubuntu-toolchain-r-test
     packages:
-    - gcc-7
-    - gcc-7-multilib
-    - g++-7
-    - g++-7-multilib
+      - gcc-7
+      - gcc-7-multilib
+      - g++-7
+      - g++-7-multilib
 install:
-- CXX=g++-7 CC=gcc-7
-- mkdir -p $HOME/deps
-- mkdir -p $HOME/deps/vcpkg
-- pushd $HOME/deps/vcpkg
-- git init
-- git remote add origin https://github.com/Microsoft/vcpkg.git
-- git fetch origin master
-- git checkout -b master origin/master
-- git pull origin master
-- "./bootstrap-vcpkg.sh"
-- "./vcpkg update"
-- "./vcpkg integrate install"
-- "./vcpkg install nlohmann-json:x64-linux nlohmann-json"
-- "./vcpkg install boost-property-tree:x64-linux boost-property-tree"
-- "./vcpkg install poco:x64-linux poco"
-- popd
+  - CXX=g++-7 CC=gcc-7
+  - mkdir -p $HOME/deps
+  - mkdir -p $HOME/deps/vcpkg
+  - pushd $HOME/deps/
+  - wget https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
+  - 7z x vcpkg-export-x64-linux.7z
+  - popd
 
 cache:
   directories:
-  - "$HOME/deps/vcpkg/installed"
+    - "$HOME/deps/vcpkg/installed"
 
 before_script:
-- CXX=g++-7 CC=gcc-7 cmake . -DCMAKE_TOOLCHAIN_FILE=/home/travis/deps/vcpkg/scripts/buildsystems/vcpkg.cmake
+  - CXX=g++-7 CC=gcc-7 cmake . -DCMAKE_TOOLCHAIN_FILE=/home/travis/deps/vcpkg-export-x64-linux/scripts/buildsystems/vcpkg.cmake
 
 script:
-- make
-- ./tools/packageTravis.sh
+  - make
+  - ./tools/hemtt
+  - ./tools/packageTravis.sh
 
 deploy:
   provider: releases

@@ -38,8 +38,6 @@ artifacts:
 - path: addons\grad_replay_intercept.pbo
   name: grad_replay_intercept_pbo
 
-
-
 for:
 -
   branches:
