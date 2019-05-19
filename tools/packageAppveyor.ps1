@@ -1,12 +1,6 @@
 New-Item $env:APPVEYOR_BUILD_FOLDER\release\@$env:APPVEYOR_PROJECT_NAME\addons -type directory | Out-Null
 New-Item $env:APPVEYOR_BUILD_FOLDER\release\@$env:APPVEYOR_PROJECT_NAME\intercept -type directory | Out-Null
 
-Copy-Item $env:APPVEYOR_BUILD_FOLDER\build\win32\${env:CONFIGURATION}\${env:APPVEYOR_PROJECT_NAME}.dll $env:APPVEYOR_BUILD_FOLDER\release\@$env:APPVEYOR_PROJECT_NAME\intercept
-Copy-Item $env:APPVEYOR_BUILD_FOLDER\build\win32\${env:CONFIGURATION}\${env:APPVEYOR_PROJECT_NAME}.pdb $env:APPVEYOR_BUILD_FOLDER\release\@$env:APPVEYOR_PROJECT_NAME\intercept
-if(${env:CONFIGURATION} -eq 'Debug') {
-    Copy-Item $env:APPVEYOR_BUILD_FOLDER\build\win32\${env:CONFIGURATION}\${env:APPVEYOR_PROJECT_NAME}.ilk $env:APPVEYOR_BUILD_FOLDER\release\@$env:APPVEYOR_PROJECT_NAME\intercept
-}
-
 Copy-Item $env:APPVEYOR_BUILD_FOLDER\build\win64\${env:CONFIGURATION}\${env:APPVEYOR_PROJECT_NAME}_x64.dll $env:APPVEYOR_BUILD_FOLDER\release\@$env:APPVEYOR_PROJECT_NAME\intercept
 Copy-Item $env:APPVEYOR_BUILD_FOLDER\build\win64\${env:CONFIGURATION}\${env:APPVEYOR_PROJECT_NAME}_x64.pdb $env:APPVEYOR_BUILD_FOLDER\release\@$env:APPVEYOR_PROJECT_NAME\intercept
 if(${env:CONFIGURATION} -eq 'Debug') {
