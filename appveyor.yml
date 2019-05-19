@@ -26,7 +26,7 @@ build:
   verbosity: minimal
 
 build_script:
-  - msbuild vcproj64\template-plugin.sln /m 
+  - msbuild vcproj64\grad_replay_intercept.sln /m 
   - tools\hemtt.exe build
   
 after_build:
