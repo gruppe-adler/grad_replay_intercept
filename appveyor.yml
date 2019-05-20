@@ -22,7 +22,7 @@ install:
   #- sh: appveyor DownloadFile https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
   #- sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
   #- sh: cd $APPVEYOR_BUILD_FOLDER
-  - sh: sudo apt install -y libboost-dev poco nlohmann-json-dev
+  - sh: sudo apt update && sudo apt install -y libboost-dev libpoco-dev nlohmann-json-dev
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
       
 before_build:
