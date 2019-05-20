@@ -19,7 +19,7 @@ install:
   # Linux vcpkg export
   - sh: mkdir -p $HOME/deps
   - sh: pushd $HOME/deps/
-  - sh: wget https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
+  - sh: appveyor DownloadFile https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
   - sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
   - sh: cd $APPVEYOR_BUILD_FOLDER
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
