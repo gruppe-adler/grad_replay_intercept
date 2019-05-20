@@ -22,7 +22,7 @@ install:
   #- sh: appveyor DownloadFile https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
   #- sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
   #- sh: cd $APPVEYOR_BUILD_FOLDER
-  - sh: sudo apt update && sudo apt install -y build-essential cmake libboost-dev libpoco-dev nlohmann-json-dev
+  - sh: sudo apt update && sudo apt install -y build-essential cmake libboost-all-dev libpoco-dev nlohmann-json-dev
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
       
 before_build:
@@ -33,7 +33,7 @@ before_build:
   - cmd: cmake .. -G "Visual Studio 15 2017 Win64" -DUSE_64BIT_BUILD=ON -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/tools/prebuild/vcpkg-export-20190519-024108/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
   - cmd: cd ..
   # Linux CMake
-  - sh: CXX=g++-8 CC=gcc-8 cmake . 
+  - sh: CXX=g++-8 CC=gcc-8 cmake . -DCMAKE_INSTALL_PREFIX=/usr/local
   #-DCMAKE_TOOLCHAIN_FILE=$HOME/deps/vcpkg-export-x64-linux/scripts/buildsystems/vcpkg.cmake
 
 build:
