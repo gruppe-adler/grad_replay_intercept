@@ -10,8 +10,8 @@ Record::Record(std::string icon, int color, Position position, float direction, 
 
 Record::Record(types::auto_array<types::game_value> record, Record* prevPtr) {
     this->prevPtr = prevPtr;
-    this->icon = record[0].is_nil() ? this->prevPtr->icon : record[0];
-    this->color = record[1].is_nil() ? this->prevPtr->color : record[1];
+    this->icon = record[0].is_nil() ? this->prevPtr->icon : std::string(record[0]);
+    this->color = record[1].is_nil() ? this->prevPtr->color : (int)record[1];
     
     if (record[2].is_nil()) {
         this->position = this->prevPtr->position;
@@ -21,9 +21,9 @@ Record::Record(types::auto_array<types::game_value> record, Record* prevPtr) {
         this->position = Position(posArray[0], posArray[1]);
     }
     
-    this->direction = record[3].is_nil() ? this->prevPtr->direction : record[3];
-    this->name = record[4].is_nil() ? this->prevPtr->name : record[4];
-    this->group = record[5].is_nil() ? this->prevPtr->group : record[5];
+    this->direction = record[3].is_nil() ? this->prevPtr->direction : (float)record[3];
+    this->name = record[4].is_nil() ? this->prevPtr->name : std::string(record[4]);
+    this->group = record[5].is_nil() ? this->prevPtr->group : std::string(record[5]);
 
     if (record.size() < 7 || record[6].is_nil() || record[6].to_array().size() == 0) {
         this->target = std::nullopt;

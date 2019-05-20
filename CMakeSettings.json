@@ -47,6 +47,35 @@
                     "type": "STRING"
                 }
             ]
+        },
+        {
+            "name": "Linux-Debug",
+            "generator": "Unix Makefiles",
+            "configurationType": "Debug",
+            "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+            "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+            "cmakeExecutable": "/usr/local/bin/cmake",
+            "remoteCopySourcesExclusionList": [ ".vs", ".git" ],
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "",
+            "ctestCommandArgs": "",
+            "cmakeToolchain": "/home/toor/dev/vcpkg/scripts/buildsystems/vcpkg.cmake",
+            "inheritEnvironments": [ "linux_x64" ],
+            "remoteMachineName": "1877857036;192.168.178.34 (username=toor, port=22, authentication=Password)",
+            "remoteCMakeListsRoot": "/var/tmp/src/${workspaceHash}/${name}",
+            "remoteBuildRoot": "/var/tmp/build/${workspaceHash}/build/${name}",
+            "remoteInstallRoot": "/var/tmp/build/${workspaceHash}/install/${name}",
+            "remoteCopySources": true,
+            "rsyncCommandArgs": "-t --delete --delete-excluded",
+            "remoteCopyBuildOutput": false,
+            "remoteCopySourcesMethod": "rsync",
+            "variables": [
+                {
+                    "name": "USE_64BIT_BUILD",
+                    "value": "True",
+                    "type": "BOOL"
+                }
+            ]
         }
     ]
 }
