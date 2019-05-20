@@ -12,7 +12,7 @@ install:
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
   # Windows vcpkg export  
-  - cmd: if([System.IO.Directory]::Exists('c:\tools\prebuild')) {mkdir c:\tools\prebuild }
+  - cmd: powershell if(![System.IO.Directory]::Exists('c:\tools\prebuild')) { mkdir c:\tools\prebuild }
   - cmd: cd c:\tools\prebuild
   - cmd: powershell if(![System.IO.File]::Exists('vcpkg-export-x64-windows-static.7z')) { Invoke-WebRequest https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-windows-static.7z -OutFile vcpkg-export-x64-windows-static.7z }
   - cmd: 7z x vcpkg-export-x64-windows-static.7z
@@ -22,7 +22,7 @@ install:
   #- sh: appveyor DownloadFile https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
   #- sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
   #- sh: cd $APPVEYOR_BUILD_FOLDER
-  - sh: apt get install -y libboost-dev poco nlohmann-json-dev
+  - sh: apt install -y libboost-dev poco nlohmann-json-dev
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
       
 before_build:
