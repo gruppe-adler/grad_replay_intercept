@@ -14,7 +14,7 @@ install:
   # Windows vcpkg export  
   - cmd: mkdir c:\tools\prebuild
   - cmd: cd c:\tools\prebuild
-  - cmd: powershell if(![System.IO.File]::Exists('vcpkg-export-x64-windows-static.7z')) Invoke-WebRequest https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-windows-static.7z -OutFile vcpkg-export-x64-windows-static.7z }
+  - cmd: powershell if(![System.IO.File]::Exists('vcpkg-export-x64-windows-static.7z')) { Invoke-WebRequest https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-windows-static.7z -OutFile vcpkg-export-x64-windows-static.7z }
   - cmd: 7z x vcpkg-export-x64-windows-static.7z
   # Linux vcpkg export
   - sh: mkdir -p $HOME/deps
