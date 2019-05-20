@@ -1,14 +1,15 @@
 version: "{build}"
 
 image: 
-  - Visual Studio 2019 Preview
+  - Visual Studio 2017
   - Ubuntu1804
 
 #cache: 
 #  - c:\tools\vcpkg\installed\
       
 install:
-  - cd %APPVEYOR_BUILD_FOLDER%
+  - sh: cd $APPVEYOR_BUILD_FOLDER
+  - ps: cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
   # Windows vcpkg export  
   - ps: mkdir c:\tools\prebuild
@@ -20,7 +21,8 @@ install:
   - sh: pushd $HOME/deps/
   - sh: wget https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
   - sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
-  - cd %APPVEYOR_BUILD_FOLDER%
+  - sh: cd $APPVEYOR_BUILD_FOLDER
+  - ps: cd %APPVEYOR_BUILD_FOLDER%
       
 before_build:
   # Windows CMake
