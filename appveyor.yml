@@ -9,28 +9,28 @@ image:
       
 install:
   - sh: cd $APPVEYOR_BUILD_FOLDER
-  - ps: cd %APPVEYOR_BUILD_FOLDER%
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
   # Windows vcpkg export  
-  - ps: mkdir c:\tools\prebuild
-  - ps: cd c:\tools\prebuild
-  - ps: Invoke-WebRequest https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-windows-static.7z -OutFile vcpkg-export-x64-windows-static.7z
-  - ps: 7z x vcpkg-export-x64-windows-static.7z
+  - cmd: mkdir c:\tools\prebuild
+  - cmd: cd c:\tools\prebuild
+  - cmd: powershell Invoke-WebRequest https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-windows-static.7z -OutFile vcpkg-export-x64-windows-static.7z
+  - cmd: 7z x vcpkg-export-x64-windows-static.7z
   # Linux vcpkg export
   - sh: mkdir -p $HOME/deps
   - sh: pushd $HOME/deps/
   - sh: wget https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
   - sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
   - sh: cd $APPVEYOR_BUILD_FOLDER
-  - ps: cd %APPVEYOR_BUILD_FOLDER%
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%
       
 before_build:
   # Windows CMake
-  - ps: mkdir build
-  - ps: mkdir vcproj64
-  - ps: cd vcproj64
-  - ps: cmake .. -G "Visual Studio 15 2017 Win64" -DUSE_64BIT_BUILD=ON -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/tools/prebuild/vcpkg-export-20190519-024108/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
-  - ps: ..
+  - cmd: mkdir build
+  - cmd: mkdir vcproj64
+  - cmd: cd vcproj64
+  - cmd: cmake .. -G "Visual Studio 15 2017 Win64" -DUSE_64BIT_BUILD=ON -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/tools/prebuild/vcpkg-export-20190519-024108/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
+  - cmd: ..
   # Linux CMake
   - sh: CXX=g++-8 CC=gcc-8 cmake . -DCMAKE_TOOLCHAIN_FILE=$HOME/deps/vcpkg-export-x64-linux/scripts/buildsystems/vcpkg.cmake
 
@@ -40,14 +40,14 @@ build:
 
 build_script:
   # Windows Build
-  - ps: msbuild vcproj64\grad_replay_intercept.sln /m 
-  - ps: tools\hemtt.exe build
+  - cmd: msbuild vcproj64\grad_replay_intercept.sln /m 
+  - cmd: tools\hemtt.exe build
   # Linux Build
   - sh: make
   - sh: .\tools\hemtt build
   
 after_build:
-  - ps: .\tools\packageWindows.ps1
+  - cmd: .\tools\packageWindows.ps1
   - sh: .\tools\packageLinux.ps1
 
 artifacts:
