@@ -66,16 +66,10 @@
             "remoteBuildRoot": "/var/tmp/build/${workspaceHash}/build/${name}",
             "remoteInstallRoot": "/var/tmp/build/${workspaceHash}/install/${name}",
             "remoteCopySources": true,
-            "rsyncCommandArgs": "-t --delete --delete-excluded",
+            "rsyncCommandArgs": "-t --delete --delete-excluded -v --progress",
             "remoteCopyBuildOutput": false,
             "remoteCopySourcesMethod": "rsync",
-            "variables": [
-                {
-                    "name": "USE_64BIT_BUILD",
-                    "value": "True",
-                    "type": "BOOL"
-                }
-            ]
+            "variables": []
         }
     ]
 }

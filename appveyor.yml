@@ -1,42 +1,60 @@
 version: "{build}"
 
-image: Visual Studio 2019 Preview
+image: 
+  - Visual Studio 2019 Preview
+  - Ubuntu1804
 
-cache: 
-  - c:\tools\vcpkg\installed\
+#cache: 
+#  - c:\tools\vcpkg\installed\
       
 install:
   - cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
-  - mkdir c:\tools\prebuild
-  - cd c:\tools\prebuild
+  # Windows vcpkg export  
+  - ps: mkdir c:\tools\prebuild
+  - ps: cd c:\tools\prebuild
   - ps: Invoke-WebRequest https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-windows-static.7z -OutFile vcpkg-export-x64-windows-static.7z
   - ps: 7z x vcpkg-export-x64-windows-static.7z
+  # Linux vcpkg export
+  - sh: mkdir -p $HOME/deps
+  - sh: pushd $HOME/deps/
+  - sh: wget https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
+  - sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
   - cd %APPVEYOR_BUILD_FOLDER%
       
 before_build:
-  - mkdir build
-  - mkdir vcproj64
-  - cd vcproj64
-  - cmake .. -G "Visual Studio 15 2017 Win64" -DUSE_64BIT_BUILD=ON -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/tools/prebuild/vcpkg-export-20190519-024108/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
-  - cd ..
+  # Windows CMake
+  - ps: mkdir build
+  - ps: mkdir vcproj64
+  - ps: cd vcproj64
+  - ps: cmake .. -G "Visual Studio 15 2017 Win64" -DUSE_64BIT_BUILD=ON -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/tools/prebuild/vcpkg-export-20190519-024108/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
+  - ps: ..
+  # Linux CMake
+  - sh: CXX=g++-8 CC=gcc-8 cmake . -DCMAKE_TOOLCHAIN_FILE=$HOME/deps/vcpkg-export-x64-linux/scripts/buildsystems/vcpkg.cmake
 
 build:
   parallel: true
   verbosity: minimal
 
 build_script:
-  - msbuild vcproj64\grad_replay_intercept.sln /m 
-  - tools\hemtt.exe build
+  # Windows Build
+  - ps: msbuild vcproj64\grad_replay_intercept.sln /m 
+  - ps: tools\hemtt.exe build
+  # Linux Build
+  - sh: make
+  - sh: .\tools\hemtt build
   
 after_build:
-  - ps: .\tools\packageAppveyor.ps1
+  - ps: .\tools\packageWindows.ps1
+  - sh: .\tools\packageLinux.ps1
 
 artifacts:
-- path: build\win64
-  name: win64
-- path: addons\grad_replay_intercept.pbo
-  name: grad_replay_intercept_pbo
+  - path: build\win64
+    name: win64
+  - path: src\grad_replay_intercept_64.so
+    name: linux64
+  - path: addons\grad_replay_intercept.pbo
+    name: grad_replay_intercept_pbo
 
 for:
 -
