@@ -12,16 +12,17 @@ install:
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
   # Windows vcpkg export  
-  - cmd: mkdir c:\tools\prebuild
+  - cmd: if([System.IO.Directory]::Exists('c:\tools\prebuild')) {mkdir c:\tools\prebuild }
   - cmd: cd c:\tools\prebuild
   - cmd: powershell if(![System.IO.File]::Exists('vcpkg-export-x64-windows-static.7z')) { Invoke-WebRequest https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-windows-static.7z -OutFile vcpkg-export-x64-windows-static.7z }
   - cmd: 7z x vcpkg-export-x64-windows-static.7z
   # Linux vcpkg export
-  - sh: mkdir -p $HOME/deps
-  - sh: pushd $HOME/deps/
-  - sh: appveyor DownloadFile https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
-  - sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
-  - sh: cd $APPVEYOR_BUILD_FOLDER
+  #- sh: mkdir -p $HOME/deps
+  #- sh: pushd $HOME/deps/
+  #- sh: appveyor DownloadFile https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
+  #- sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
+  #- sh: cd $APPVEYOR_BUILD_FOLDER
+  - sh: apt get install -y libboost-dev poco nlohmann-json-dev
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
       
 before_build:
@@ -32,7 +33,8 @@ before_build:
   - cmd: cmake .. -G "Visual Studio 15 2017 Win64" -DUSE_64BIT_BUILD=ON -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/tools/prebuild/vcpkg-export-20190519-024108/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
   - cmd: cd ..
   # Linux CMake
-  - sh: CXX=g++-8 CC=gcc-8 cmake . -DCMAKE_TOOLCHAIN_FILE=$HOME/deps/vcpkg-export-x64-linux/scripts/buildsystems/vcpkg.cmake
+  - sh: CXX=g++-8 CC=gcc-8 cmake . 
+  #-DCMAKE_TOOLCHAIN_FILE=$HOME/deps/vcpkg-export-x64-linux/scripts/buildsystems/vcpkg.cmake
 
 build:
   parallel: true
