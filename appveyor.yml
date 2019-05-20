@@ -47,7 +47,7 @@ build_script:
   - sh: .\tools\hemtt build
   
 after_build:
-  - cmd: .\tools\packageWindows.ps1
+  - cmd: powershell .\tools\packageWindows.ps1
   - sh: .\tools\packageLinux.ps1
 
 artifacts:
