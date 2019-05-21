@@ -17,12 +17,12 @@ install:
   - cmd: powershell if(![System.IO.File]::Exists('vcpkg-export-x64-windows-static.7z')) { Invoke-WebRequest https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-windows-static.7z -OutFile vcpkg-export-x64-windows-static.7z }
   - cmd: 7z x vcpkg-export-x64-windows-static.7z
   # Linux vcpkg export
-  #- sh: mkdir -p $HOME/deps
-  #- sh: pushd $HOME/deps/
-  #- sh: appveyor DownloadFile https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
-  #- sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
-  #- sh: cd $APPVEYOR_BUILD_FOLDER
-  - sh: sudo apt update && sudo apt install -y build-essential cmake libboost-all-dev libpoco-dev nlohmann-json-dev
+  - sh: mkdir -p $HOME/deps
+  - sh: pushd $HOME/deps/
+  - sh: appveyor DownloadFile https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
+  - sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
+  - sh: cd $APPVEYOR_BUILD_FOLDER
+  #- sh: sudo apt update && sudo apt install -y build-essential cmake libboost-all-dev libpoco-dev nlohmann-json-dev
   - sh: ld -v
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
       
@@ -35,8 +35,7 @@ before_build:
   - cmd: cd ..
   # Linux CMake
   - sh: whereis boost
-  - sh: CXX=g++-8 CC=gcc-8 cmake . -DCMAKE_INSTALL_PREFIX=/usr/local
-  #-DCMAKE_TOOLCHAIN_FILE=$HOME/deps/vcpkg-export-x64-linux/scripts/buildsystems/vcpkg.cmake
+  - sh: CXX=g++-8 CC=gcc-8 cmake . -DCMAKE_TOOLCHAIN_FILE=$HOME/deps/vcpkg-export-x64-linux/scripts/buildsystems/vcpkg.cmake
 
 build:
   parallel: true
