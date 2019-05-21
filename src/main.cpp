@@ -215,8 +215,12 @@ void intercept::pre_start() {
 
 void intercept::post_init() {
     if ((bool)sqf::get_number(sqf::config_entry(sqf::mission_config_file()) >> ("GRAD_replay") >> ("upload"))) {
+#ifdef _WIN32
         __SQF(["CBA_loadingScreenDone", { gradReplayInterceptStartRecord }] call CBA_fnc_addEventHandler);
         __SQF(["GRAD_replay_stopped", { gradReplayInterceptSendReplay GRAD_REPLAY_DATABASE }] call CBA_fnc_addEventHandler);
+#else
+#warning "__SQF() macros skipped, call the commands from inside the mission!"
+#endif
     }
 }
 
