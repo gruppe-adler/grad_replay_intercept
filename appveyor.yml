@@ -29,7 +29,6 @@ before_build:
   - cmd: cmake .. -G "Visual Studio 15 2017 Win64" -DUSE_64BIT_BUILD=ON -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/tools/prebuild/vcpkg-export-20190519-024108/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
   - cmd: cd ..
   # Linux CMake
-  - sh: whereis boost
   - sh: CXX=g++-8 CC=gcc-8 cmake . -DCMAKE_TOOLCHAIN_FILE=$HOME/deps/vcpkg-export-x64-linux/scripts/buildsystems/vcpkg.cmake
 
 build:
@@ -75,11 +74,11 @@ for:
         APPVEYOR_REPO_TAG: true
 
   configuration: Release
-  
+
 -
   configuration: Debug
-  
--  
+
+-
   matrix:
     only:
       - image: Visual Studio 2017
