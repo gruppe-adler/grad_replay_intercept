@@ -10,6 +10,7 @@ addons:
       - g++-8
       - g++-8-multilib
       - p7zip-full
+      - libssl1.1
 install:
   - mkdir -p $HOME/deps
   - mkdir -p $HOME/deps/vcpkg
