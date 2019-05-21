@@ -23,6 +23,7 @@ install:
   #- sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
   #- sh: cd $APPVEYOR_BUILD_FOLDER
   - sh: sudo apt update && sudo apt install -y build-essential cmake libboost-all-dev libpoco-dev nlohmann-json-dev
+  - sh: ld -v
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
       
 before_build:
