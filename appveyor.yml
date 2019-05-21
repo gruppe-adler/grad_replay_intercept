@@ -14,18 +14,16 @@ install:
   # Windows vcpkg export  
   - cmd: powershell if(![System.IO.Directory]::Exists('c:\tools\prebuild')) { mkdir c:\tools\prebuild }
   - cmd: cd c:\tools\prebuild
-  - cmd: powershell if(![System.IO.File]::Exists('vcpkg-export-x64-windows-static.7z')) { Invoke-WebRequest https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-windows-static.7z -OutFile vcpkg-export-x64-windows-static.7z }
+  - cmd: appveyor DownloadFile https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-windows-static.7z -OutFile vcpkg-export-x64-windows-static.7z
   - cmd: 7z x vcpkg-export-x64-windows-static.7z
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%
   # Linux vcpkg export
   - sh: mkdir -p $HOME/deps
-  - sh: pushd $HOME/deps/
+  - sh: cd $HOME/deps/
   - sh: appveyor DownloadFile https://github.com/TheWillard/ci-toolchains/raw/master/vcpkg-export-x64-linux.7z
   - sh: 7z x vcpkg-export-x64-linux.7z > /dev/null
   - sh: cd $APPVEYOR_BUILD_FOLDER
-  #- sh: sudo apt update && sudo apt install -y build-essential cmake libboost-all-dev libpoco-dev nlohmann-json-dev
-  - sh: ld -v
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%
-      
+
 before_build:
   # Windows CMake
   - cmd: mkdir build
@@ -56,7 +54,7 @@ after_build:
 artifacts:
   - path: build\win64
     name: win64
-  - path: src\grad_replay_intercept_64.so
+  - path: src\grad_replay_intercept_x64.so
     name: linux64
   - path: addons\grad_replay_intercept.pbo
     name: grad_replay_intercept_pbo
