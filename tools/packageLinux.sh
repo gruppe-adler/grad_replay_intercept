@@ -17,6 +17,7 @@ else
     tagToAdd="$APPVEYOR_REPO_COMMIT"
     echo "Tag not found, using commit hash"
 fi
+
 zip -r "@${repoName}_$tagToAdd.zip" @${repoName}
 appveyor PushArtifact "@${repoName}_$tagToAdd.zip" -DeploymentName zip
 echo "Done"
