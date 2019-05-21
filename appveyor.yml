@@ -4,9 +4,6 @@ image:
   - Visual Studio 2017
   - Ubuntu1804
 
-#cache: 
-  #- c:\tools\prebuild\vcpkg-export-x64-windows-static.7z
-      
 install:
   - sh: cd $APPVEYOR_BUILD_FOLDER
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
@@ -81,3 +78,16 @@ for:
   
 -
   configuration: Debug
+  matrix:
+    only:
+      - image: Visual Studio 2017
+
+  cache:
+    - c:\tools\prebuild\vcpkg-export-x64-windows-static.7z
+-
+  configuration: Debug
+  matrix:
+    only:
+      - image: Ubuntu1804
+  cache:
+    - $HOME/deps/vcpkg-export-x64-windows-static.7z
