@@ -50,6 +50,8 @@ void grad::replay::to_json(nl::json& j, const Record& r)
             icon = "Truck";
         else if (icon == "Man")
             icon = "iconMan";
+        else if (icon == "ParachuteBase")
+            icon = "Parachute";
     }
 
     j = nl::json{ {"icon", icon} , {"color", Record::colorMap[r.color]}, { "position", r.position },

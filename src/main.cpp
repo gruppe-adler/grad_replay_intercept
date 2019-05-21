@@ -25,6 +25,7 @@
 #include <chrono>
 #include <filesystem>
 #include <memory>
+#include <algorithm>
 
 namespace nl = nlohmann;
 
@@ -36,8 +37,7 @@ using namespace grad::replay;
 
 using SQFPar = game_value_parameter;
 
-#define REPLAY_URL "https://replay.gruppe-adler.de/"
-
+std::string url = "";
 std::string token = "";
 std::chrono::system_clock::time_point missionStart;
 
@@ -55,21 +55,7 @@ int intercept::api_version() {
 void intercept::register_interfaces() {}
 
 void intercept::pre_init() {
-    intercept::sqf::diag_log("The Intercept template plugin is running!");
-
-    // load token from config
-    boost::property_tree::ptree pt;
-    auto path = std::filesystem::path("grad_replay_interept_config.ini").string();
-    try {
-        boost::property_tree::ini_parser::read_ini(path, pt);
-        token = pt.get<std::string>("Config.BearerToken");
-        sqf::diag_log(token);
-    }
-    catch (boost::property_tree::ini_parser_error ex) {
-        sqf::diag_log("grad_replay_intercept couldn't parse @grad_replay_intercept/config.ini, writing a new one");
-        pt.add<std::string>("Config.BearerToken", "InsertYourBearerTokenHere");
-        boost::property_tree::ini_parser::write_ini(path, pt);
-    }
+    intercept::sqf::diag_log("The grad_replay_intercept plugin is running!");
 }
 
 nl::json constructData(types::auto_array<types::game_value> rootArray) {
@@ -132,7 +118,9 @@ game_value sendReplay(game_state &gs, SQFPar right_arg) {
         auto now = std::chrono::system_clock::now();
         obj["duration"] = std::chrono::duration_cast<std::chrono::seconds>(now - missionStart).count();
 
-        obj["worldName"] = sqf::world_name();
+        auto worldName = std::string(sqf::world_name());
+        std::transform(worldName.begin(), worldName.end(), worldName.begin(), ::tolower);
+        obj["worldName"] = worldName;
         obj["data"] = constructData(right_arg.to_array());
 
         // Needed only on Windows/NOP on everything else
@@ -140,7 +128,7 @@ game_value sendReplay(game_state &gs, SQFPar right_arg) {
 
         try
         {
-            p::URI uri(REPLAY_URL);
+            p::URI uri(url);
             std::string path(uri.getPathAndQuery());
 
             const pn::Context::Ptr context(new pn::Context(pn::Context::CLIENT_USE, "rootcert.pem"));
@@ -177,11 +165,15 @@ game_value sendReplay(game_state &gs, SQFPar right_arg) {
             sqf::diag_log(responseLog.str());
 
             if (response.getStatus() != pn::HTTPResponse::HTTPStatus::HTTP_CREATED) {
+                std::ofstream o(timePointToString(now).append(".json"));
+                o << std::setw(4) << obj << std::endl;
                 return false;
             }
         }
         catch (p::Exception & ex)
         {
+            std::ofstream o(timePointToString(now).append(".json"));
+            o << std::setw(4) << obj << std::endl;
             sqf::diag_log(ex.displayText());
             return false;
         }
@@ -206,11 +198,29 @@ game_value startRecord() {
 
 
 void intercept::pre_start() {
+    
+    // load token from config
+    boost::property_tree::ptree pt;
+    auto path = std::filesystem::path("grad_replay_intercept_config.ini").string();
+    try {
+        boost::property_tree::ini_parser::read_ini(path, pt);
+        url = pt.get<std::string>("Config.ReplayUrl");
+        token = pt.get<std::string>("Config.BearerToken");
+        sqf::diag_log(token);
+    }
+    catch (boost::property_tree::ini_parser_error ex) {
+        sqf::diag_log("grad_replay_intercept couldn't parse @grad_replay_intercept/config.ini, writing a new one");
+        pt.add<std::string>("Config.ReplayUrl", "https://replay.gruppe-adler.de/");
+        pt.add<std::string>("Config.BearerToken", "InsertYourBearerTokenHere");
+        boost::property_tree::ini_parser::write_ini(path, pt);
+    }
+    
     static auto grad_replay_intercept_replay_start = 
         client::host::register_sqf_command("gradReplayInterceptStartRecord", "Called when Recording is started", userFunctionWrapper<startRecord>, game_data_type::BOOL);
 
     static auto grad_replay_intercept_replay_send =
         client::host::register_sqf_command("gradReplayInterceptSendReplay", "Sends the replay", sendReplay, game_data_type::BOOL, game_data_type::ARRAY);
+
 }
 
 void intercept::post_init() {

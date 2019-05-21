@@ -45,7 +45,7 @@ namespace grad {
             };
 
             static inline std::vector<std::string> iconTypes {
-                "StaticMortar", "StaticWeapon", "Tank", "Motorcycle", "Helicopter", "Plane", "Ship", "Truck_F", "Static", "Car", "Man"
+                "StaticMortar", "StaticWeapon", "ParachuteBase", "Tank", "Motorcycle", "Helicopter", "Plane", "Ship", "Truck_F", "Static", "Car", "Man"
             };
             
             Record() {};
