@@ -51,7 +51,7 @@ build_script:
   
 after_build:
   - cmd: powershell .\tools\packageWindows.ps1
-  - sh: ./tools/packageLinux.ps1
+  - sh: ./tools/packageLinux.sh
 
 artifacts:
   - path: build\win64
