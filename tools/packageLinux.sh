@@ -19,5 +19,5 @@ else
 fi
 
 zip -r "@${repoName}_$tagToAdd.zip" @${repoName}
-appveyor PushArtifact "@${repoName}_$tagToAdd.zip" -DeploymentName zip
+appveyor PushArtifact "@${repoName}_${tagToAdd}_linux.zip" -DeploymentName zip
 echo "Done"
