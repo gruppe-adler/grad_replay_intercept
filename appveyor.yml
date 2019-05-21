@@ -90,4 +90,4 @@ for:
     only:
       - image: Ubuntu1804
   cache:
-    - $HOME/deps/vcpkg-export-x64-linux-static.7z
+    - $HOME/deps/vcpkg-export-x64-linux.7z
