@@ -47,11 +47,11 @@ build_script:
   - cmd: tools\hemtt.exe build
   # Linux Build
   - sh: make
-  - sh: .\tools\hemtt build
+  - sh: ./tools/hemtt build
   
 after_build:
   - cmd: powershell .\tools\packageWindows.ps1
-  - sh: .\tools\packageLinux.ps1
+  - sh: ./tools/packageLinux.ps1
 
 artifacts:
   - path: build\win64
