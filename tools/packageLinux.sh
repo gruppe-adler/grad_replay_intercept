@@ -18,6 +18,6 @@ else
     echo "Tag not found, using commit hash"
 fi
 
-zip -r "@${repoName}_${tagToAdd}_linux.zip" @${repoName}
-appveyor PushArtifact "@${repoName}_${tagToAdd}_linux.zip" -DeploymentName zip
+zip -r "${repoName}_${tagToAdd}_linux.zip" @${repoName}
+appveyor PushArtifact "${repoName}_${tagToAdd}_linux.zip" -DeploymentName zip
 echo "Done"
