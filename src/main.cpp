@@ -104,90 +104,88 @@ nl::json constructData(types::auto_array<types::game_value> rootArray) {
 }
 
 game_value sendReplay(game_state &gs, SQFPar right_arg) {
-
-    // Yes, I'm scared
+    std::thread sendReplayThread([right_arg]() {
+        // Yes, I'm scared
 #ifndef _DEBUG
-    try {
+        try {
 #endif // !_DEBUG
+            client::invoker_lock thread_lock;
+            // Construct JSON Object
+            auto obj = nl::json();
+            obj["missionName"] = sqf::mission_name();
+            obj["date"] = timePointToString(missionStart);
 
-        // Construct JSON Object
-        auto obj = nl::json();
-        obj["missionName"] = sqf::mission_name();
-        obj["date"] = timePointToString(missionStart);
+            auto now = std::chrono::system_clock::now();
+            obj["duration"] = std::chrono::duration_cast<std::chrono::seconds>(now - missionStart).count();
 
-        auto now = std::chrono::system_clock::now();
-        obj["duration"] = std::chrono::duration_cast<std::chrono::seconds>(now - missionStart).count();
+            auto worldName = std::string(sqf::world_name());
+            std::transform(worldName.begin(), worldName.end(), worldName.begin(), ::tolower);
+            obj["worldName"] = worldName;
+            obj["data"] = constructData(right_arg.to_array());
+            thread_lock.unlock();
+            // Needed only on Windows/NOP on everything else
+            pn::initializeNetwork();
 
-        auto worldName = std::string(sqf::world_name());
-        std::transform(worldName.begin(), worldName.end(), worldName.begin(), ::tolower);
-        obj["worldName"] = worldName;
-        obj["data"] = constructData(right_arg.to_array());
+            try
+            {
+                p::URI uri(url);
+                std::string path(uri.getPathAndQuery());
 
-        // Needed only on Windows/NOP on everything else
-        pn::initializeNetwork();
+                const pn::Context::Ptr context(new pn::Context(pn::Context::CLIENT_USE, "rootcert.pem"));
+                pn::HTTPSClientSession session(uri.getHost(), uri.getPort(), context);
 
-        try
-        {
-            p::URI uri(url);
-            std::string path(uri.getPathAndQuery());
+                pn::HTTPRequest request(pn::HTTPRequest::HTTP_POST, path, pn::HTTPMessage::HTTP_1_1);
+                pn::HTTPResponse response;
 
-            const pn::Context::Ptr context(new pn::Context(pn::Context::CLIENT_USE, "rootcert.pem"));
-            pn::HTTPSClientSession session(uri.getHost(), uri.getPort(), context);
+                std::stringstream ss;
+                ss << obj;
 
-            pn::HTTPRequest request(pn::HTTPRequest::HTTP_POST, path, pn::HTTPMessage::HTTP_1_1);
-            pn::HTTPResponse response;
+                request.setKeepAlive(false);
+                request.setContentLength(ss.str().size());
+                request.setContentType("application/json");
 
-            std::stringstream ss;
-            ss << obj;
+                auto bearerToken = std::string("Bearer ").append(token);
 
-            request.setKeepAlive(false);
-            request.setContentLength(ss.str().size());
-            request.setContentType("application/json");
+                request.set("Authorization", bearerToken);
+                request.set("User-Agent", "grad_replay_intercept/0.1");
 
-            auto bearerToken = std::string("Bearer ").append(token);
+                std::ostream& o = session.sendRequest(request);
+                o << obj;
 
-            request.set("Authorization", bearerToken);
-            request.set("User-Agent", "grad_replay_intercept/0.1");
+                session.receiveResponse(response);
+                /*
+                std::istream& is =
+                std::stringstream responseSStream;
+                p::StreamCopier::copyStream(is, responseSStream);
+                sqf::diag_log(responseSStream.str());
+                */
 
-            std::ostream& o = session.sendRequest(request);
-            o << obj;
+                std::stringstream responseLog;
+                responseLog << "[GRAD] (replay_intercept) INFO: POST Request Status " << response.getStatus() << " Reason " << response.getReason();
+                sqf::diag_log(responseLog.str());
 
-            session.receiveResponse(response);
-            /*
-            std::istream& is =
-            std::stringstream responseSStream;
-            p::StreamCopier::copyStream(is, responseSStream);
-            sqf::diag_log(responseSStream.str());
-            */
-
-            std::stringstream responseLog;
-            responseLog << "[GRAD] (replay_intercept) INFO: POST Request Status " << response.getStatus() << " Reason " << response.getReason();
-            sqf::diag_log(responseLog.str());
-
-            if (response.getStatus() != pn::HTTPResponse::HTTPStatus::HTTP_CREATED) {
+                if (response.getStatus() != pn::HTTPResponse::HTTPStatus::HTTP_CREATED) {
+                    std::ofstream o(timePointToString(now).append(".json"));
+                    o << std::setw(4) << obj << std::endl;
+                }
+            }
+            catch (p::Exception& ex)
+            {
                 std::ofstream o(timePointToString(now).append(".json"));
                 o << std::setw(4) << obj << std::endl;
-                return false;
+                sqf::diag_log(ex.displayText());
             }
-        }
-        catch (p::Exception & ex)
-        {
-            std::ofstream o(timePointToString(now).append(".json"));
-            o << std::setw(4) << obj << std::endl;
-            sqf::diag_log(ex.displayText());
-            return false;
-        }
-        return true;
 #ifndef _DEBUG
-    }
-    catch (std::exception& ex) {
-        std::stringstream responseLog;
-        responseLog << "[GRAD] (replay_intercept) CRASH: " << ex.what();
-        sqf::diag_log(responseLog.str());
-        return false;
-    }
+        }
+        catch (std::exception& ex) {
+            std::stringstream responseLog;
+            responseLog << "[GRAD] (replay_intercept) CRASH: " << ex.what();
+            sqf::diag_log(responseLog.str());
+        }
 #endif // !_DEBUG
-
+        });
+    sendReplayThread.detach();
+    return true;
 }
 
 game_value startRecord() {
