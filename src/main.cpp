@@ -103,29 +103,29 @@ nl::json constructData(types::auto_array<types::game_value> rootArray) {
     return result;
 }
 
-game_value sendReplay(game_state &gs, SQFPar right_arg) {
-    std::thread sendReplayThread([right_arg]() {
-        // Yes, I'm scared
+game_value sendReplay(game_state& gs, SQFPar right_arg) {
+
+    // Yes, I'm scared
 #ifndef _DEBUG
-        try {
+    try {
 #endif // !_DEBUG
-            client::invoker_lock thread_lock;
-            // Construct JSON Object
-            auto obj = nl::json();
-            obj["missionName"] = sqf::mission_name();
-            obj["date"] = timePointToString(missionStart);
+        // Construct JSON Object
+        auto obj = nl::json();
+        obj["missionName"] = sqf::mission_name();
+        obj["date"] = timePointToString(missionStart);
 
-            auto now = std::chrono::system_clock::now();
-            obj["duration"] = std::chrono::duration_cast<std::chrono::seconds>(now - missionStart).count();
+        auto now = std::chrono::system_clock::now();
+        obj["duration"] = std::chrono::duration_cast<std::chrono::seconds>(now - missionStart).count();
 
-            auto worldName = std::string(sqf::world_name());
-            std::transform(worldName.begin(), worldName.end(), worldName.begin(), ::tolower);
-            obj["worldName"] = worldName;
-            obj["data"] = constructData(right_arg.to_array());
-            thread_lock.unlock();
-            // Needed only on Windows/NOP on everything else
-            pn::initializeNetwork();
+        auto worldName = std::string(sqf::world_name());
+        std::transform(worldName.begin(), worldName.end(), worldName.begin(), ::tolower);
+        obj["worldName"] = worldName;
+        obj["data"] = constructData(right_arg.to_array());
 
+        // Needed only on Windows/NOP on everything else
+        pn::initializeNetwork();
+
+        std::thread sendReplayThread([obj, now]() {
             try
             {
                 p::URI uri(url);
@@ -157,34 +157,44 @@ game_value sendReplay(game_state &gs, SQFPar right_arg) {
                 std::istream& is =
                 std::stringstream responseSStream;
                 p::StreamCopier::copyStream(is, responseSStream);
+                client::invoker_lock thread_lock;
                 sqf::diag_log(responseSStream.str());
                 */
 
-                std::stringstream responseLog;
-                responseLog << "[GRAD] (replay_intercept) INFO: POST Request Status " << response.getStatus() << " Reason " << response.getReason();
-                sqf::diag_log(responseLog.str());
-
                 if (response.getStatus() != pn::HTTPResponse::HTTPStatus::HTTP_CREATED) {
-                    std::ofstream o(timePointToString(now).append(".json"));
+                    auto path = std::string(timePointToString(now)).append(".json");
+                    std::replace(path.begin(), path.end(), ':', '-');
+                    std::ofstream o(path);
                     o << std::setw(4) << obj << std::endl;
                 }
+
+                std::stringstream responseLog;
+                responseLog << "[GRAD] (replay_intercept) INFO: POST Request Status " << response.getStatus() << " Reason " << response.getReason();
+                client::invoker_lock thread_lock;
+                sqf::diag_log(responseLog.str());
             }
             catch (p::Exception& ex)
             {
-                std::ofstream o(timePointToString(now).append(".json"));
+                auto path = std::string(timePointToString(now)).append(".json");
+                std::replace(path.begin(), path.end(), ':', '-');
+                std::ofstream o(path);
                 o << std::setw(4) << obj << std::endl;
-                sqf::diag_log(ex.displayText());
+
+                std::stringstream exceptionLog;
+                exceptionLog << "[GRAD] (replay_intercept) INFO: Exception during POST Request " << ex.displayText();
+                client::invoker_lock thread_lock;
+                sqf::diag_log(exceptionLog.str());
             }
-#ifndef _DEBUG
-        }
-        catch (std::exception& ex) {
-            std::stringstream responseLog;
-            responseLog << "[GRAD] (replay_intercept) CRASH: " << ex.what();
-            sqf::diag_log(responseLog.str());
-        }
-#endif // !_DEBUG
         });
-    sendReplayThread.detach();
+        sendReplayThread.detach();
+#ifndef _DEBUG
+    }
+    catch (std::exception& ex) {
+        std::stringstream responseLog;
+        responseLog << "[GRAD] (replay_intercept) CRASH: " << ex.what();
+        sqf::diag_log(responseLog.str());
+    }
+#endif // !_DEBUG
     return true;
 }
 
@@ -204,7 +214,6 @@ void intercept::pre_start() {
         boost::property_tree::ini_parser::read_ini(path, pt);
         url = pt.get<std::string>("Config.ReplayUrl");
         token = pt.get<std::string>("Config.BearerToken");
-        sqf::diag_log(token);
     }
     catch (boost::property_tree::ini_parser_error ex) {
         sqf::diag_log("grad_replay_intercept couldn't parse @grad_replay_intercept/config.ini, writing a new one");
