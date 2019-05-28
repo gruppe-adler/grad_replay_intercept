@@ -75,33 +75,22 @@ nl::json constructData(types::auto_array<types::game_value> rootArray) {
     auto sendingChunkSize = (int)sqf::get_number(gradReplayConfig >> ("sendingChunkSize"));
     auto trackShots = (bool)sqf::get_number(gradReplayConfig >> ("trackShots"));
 
-    std::vector<ReplayPart> replayParts;
+    std::vector<std::shared_ptr<ReplayPart>> replayParts;
     replayParts.reserve(rootArray.size());
 
-    for (int i = 0; i < rootArray.size(); i++) {
-        std::vector<Record*> prevElVec;
-        if (replayParts.size() > 0) {
-            auto records = &replayParts[i - 1].records;
-            for (int j = 0; j < records->size(); j++) {
-                auto elem = records->at(j);
-                if(elem) {
-                    auto prevPtr = &elem.value();
-                    if (prevPtr == nullptr) {                    
-                        prevElVec.push_back(std::make_shared<Record>("", -1, Position(0, 0), -1.0f, "", "", std::nullopt).get());
-                    } else {
-                        prevElVec.push_back(prevPtr);
-                    }
-                } else {
-                    prevElVec.push_back(std::nullopt);
-                }
-            }
-        }
-        replayParts.push_back(ReplayPart(rootArray[i].to_array(), prevElVec));
+    std::shared_ptr<ReplayPart> prevReplayPart;
 
+    for (int i = 0; i < rootArray.size(); i++) {
+        auto replayPart = std::make_shared<ReplayPart>(rootArray[i].to_array(), prevReplayPart);
+        replayParts.push_back(replayPart);
+        prevReplayPart = replayPart;
     }
 
     auto result = nl::json();
-    result["replay"] = replayParts;
+
+    for (auto& replayPart : replayParts) {
+        result["replay"].push_back(*replayPart);
+    }
     result["config"] = { {"precision", precision }, {"trackedSides", trackedSides}, {"stepsPerTick", stepsPerTick}, {"trackedVehicles", trackedVehicles},
         {"trackedAI", trackedAI}, {"sendingChunkSize", sendingChunkSize}, {"trackShots", trackShots} };
 
