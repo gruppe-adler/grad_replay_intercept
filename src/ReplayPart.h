@@ -18,7 +18,7 @@ namespace grad {
     namespace replay {
         class ReplayPart {
         public:
-            std::vector<Record> records;
+            std::vector<std::optional<Record>> records;
             std::string time;
 
             ReplayPart(types::auto_array<types::game_value> replay, std::vector<Record*> prevRecordPtrVec);

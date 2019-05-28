@@ -8,7 +8,15 @@ using namespace grad::replay;
 Record::Record(std::string icon, int color, Position position, float direction, std::string name, std::string group, std::optional<Position> target) : 
     icon(icon), color(color), position(position), direction(direction), name(name), group(group), target(target) {}
 
-Record::Record(types::auto_array<types::game_value> record, Record* prevPtr) {
+Record::Record(types::auto_array<types::game_value> record, std::optional<Record*> prevPtr) {
+
+    if(prevPtr) {
+        this->prevPtr = prevPtr;
+    } else {
+        // find first existent prevPtr
+        
+    }
+
     this->prevPtr = prevPtr;
     this->icon = record[0].is_nil() ? this->prevPtr->icon : std::string(record[0]);
     this->color = record[1].is_nil() ? this->prevPtr->color : (int)record[1];

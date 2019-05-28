@@ -83,11 +83,16 @@ nl::json constructData(types::auto_array<types::game_value> rootArray) {
         if (replayParts.size() > 0) {
             auto records = &replayParts[i - 1].records;
             for (int j = 0; j < records->size(); j++) {
-                auto prevPtr = &records->at(j);
-                if (prevPtr == nullptr) {                    
-                    prevElVec.push_back(std::make_shared<Record>("", -1, Position(0, 0), -1.0f, "", "", std::nullopt).get());
+                auto elem = records->at(j);
+                if(elem) {
+                    auto prevPtr = &elem.value();
+                    if (prevPtr == nullptr) {                    
+                        prevElVec.push_back(std::make_shared<Record>("", -1, Position(0, 0), -1.0f, "", "", std::nullopt).get());
+                    } else {
+                        prevElVec.push_back(prevPtr);
+                    }
                 } else {
-                    prevElVec.push_back(prevPtr);
+                    prevElVec.push_back(std::nullopt);
                 }
             }
         }

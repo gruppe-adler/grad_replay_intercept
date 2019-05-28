@@ -50,7 +50,7 @@ namespace grad {
             
             Record() {};
             Record(std::string icon, int color, Position position, float direction, std::string name, std::string group, std::optional<Position> target);
-            Record(types::auto_array<types::game_value> record, Record* prevPtr);
+            Record(types::auto_array<types::game_value> record, std::optional<Record*> prevPtr);
         };
         void to_json(nl::json& j, const Record& r);
         void from_json(const nl::json& j, Record& r);
