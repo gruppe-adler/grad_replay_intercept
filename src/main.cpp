@@ -32,6 +32,8 @@ namespace nl = nlohmann;
 namespace p = Poco;
 namespace pn = Poco::Net;
 
+namespace fs = std::filesystem;
+
 using namespace intercept;
 using namespace grad::replay;
 
@@ -40,6 +42,7 @@ using SQFPar = game_value_parameter;
 std::string url = "";
 std::string token = "";
 std::chrono::system_clock::time_point missionStart;
+fs::path basePath;
 
 std::string timePointToString(std::chrono::system_clock::time_point timePoint) {
     std::time_t missionStartInTimeT = std::chrono::system_clock::to_time_t(timePoint);
@@ -158,7 +161,7 @@ game_value sendReplay(game_state& gs, SQFPar right_arg) {
                 if (response.getStatus() != pn::HTTPResponse::HTTPStatus::HTTP_CREATED) {
                     auto path = std::string(timePointToString(now)).append(".json");
                     std::replace(path.begin(), path.end(), ':', '-');
-                    std::ofstream o(path);
+                    std::ofstream o(basePath / path);
                     o << std::setw(4) << obj << std::endl;
                 }
 
@@ -171,7 +174,7 @@ game_value sendReplay(game_state& gs, SQFPar right_arg) {
             {
                 auto path = std::string(timePointToString(now)).append(".json");
                 std::replace(path.begin(), path.end(), ':', '-');
-                std::ofstream o(path);
+                std::ofstream o(basePath / path);
                 o << std::setw(4) << obj << std::endl;
 
                 std::stringstream exceptionLog;
@@ -214,6 +217,12 @@ void intercept::pre_start() {
         pt.add<std::string>("Config.ReplayUrl", "https://replay.gruppe-adler.de/");
         pt.add<std::string>("Config.BearerToken", "InsertYourBearerTokenHere");
         boost::property_tree::ini_parser::write_ini(path, pt);
+    }
+
+    basePath = "grad_replay_intercept";
+
+    if (!fs::exists(basePath)) {
+        fs::create_directories(basePath);
     }
     
     static auto grad_replay_intercept_replay_send =
