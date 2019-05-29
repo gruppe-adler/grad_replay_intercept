@@ -18,10 +18,11 @@ namespace grad {
     namespace replay {
         class ReplayPart {
         public:
-            std::vector<Record> records;
+            std::vector<std::optional<std::shared_ptr<Record>>> records;
             std::string time;
+            std::shared_ptr<ReplayPart> prevReplayPart;
 
-            ReplayPart(types::auto_array<types::game_value> replay, std::vector<Record*> prevRecordPtrVec);
+            ReplayPart(types::auto_array<types::game_value> replay, std::shared_ptr<ReplayPart> replayPart);
             static std::string convertDaytimeToString(float daytime);
         };
 

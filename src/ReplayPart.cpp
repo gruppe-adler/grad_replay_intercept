@@ -2,13 +2,43 @@
 
 using namespace grad::replay;
 
-ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::vector<Record*> prevRecordPtrVec) {
+ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::shared_ptr<ReplayPart> prevReplayPart) {
+    this->prevReplayPart = prevReplayPart;
+
     for (int i = 0; i < replay.size(); i++) {
-        if (replay[i].type_enum() == game_data_type::ARRAY) {
-            this->records.push_back(Record(replay[i].to_array(), prevRecordPtrVec.size() > 0 && i < prevRecordPtrVec.size() ? prevRecordPtrVec[i] : 
-                std::make_shared<Record>("", -1, Position(0, 0), -1.0f, "", "", std::nullopt).get()));
+        if(replay[i].is_null()) { // <null>
+            this->records.push_back(std::nullopt);
         }
-        else {
+        else if (replay[i].type_enum() == game_data_type::ARRAY) { // [...]
+            if (this->prevReplayPart != nullptr && this->prevReplayPart->records.size() > 0 && i < this->prevReplayPart->records.size()) {
+                auto record = this->prevReplayPart->records[i];
+
+                if (record) {
+                    this->records.push_back(std::make_shared<Record>(replay[i].to_array(), record.value()));
+                }
+                else { // prev was <null>
+                    auto prevPrevReplayPart = this->prevReplayPart->prevReplayPart;
+                    
+                    while (prevPrevReplayPart != nullptr) { // Iterate back until a record is found
+                        if (prevPrevReplayPart->records.size() > 0 && i < prevPrevReplayPart->records.size()) {
+                            auto record = prevPrevReplayPart->records[i];
+
+                            if (record) {
+                                this->records.push_back(std::make_shared<Record>(replay[i].to_array(), record.value()));
+                                prevPrevReplayPart = nullptr;
+                            }
+                        }
+                        if (prevPrevReplayPart != nullptr) {
+                            prevPrevReplayPart = prevPrevReplayPart->prevReplayPart;
+                        }
+                    }
+                }
+            }
+            else {
+                this->records.push_back(std::make_shared<Record>(replay[i].to_array(), std::make_shared<Record>("", -1, Position(0, 0), -1.0f, "", "", std::nullopt)));
+            }
+        }
+        else { // 12.30
             this->time = ReplayPart::convertDaytimeToString(replay[i]);
         }
     }    
@@ -39,15 +69,22 @@ void grad::replay::to_json(nl::json& j, const ReplayPart& rp)
 {
     j = nl::json();
     for (auto& record : rp.records) {
-        j["data"].push_back(record);
+        if(record) {
+            j["data"].push_back(*record.value());
+        } 
+        /* DEBUG
+        else {
+            j["data"].push_back(nl::json::array());
+        }
+        */
     }
     j["time"] = rp.time;
 }
 
-// TODO
+// TODO: should be possible
 void grad::replay::from_json(const nl::json& j, ReplayPart& rp)
 {
-    j.at("record").get_to(rp.records);
+    //j.at("record").get_to(rp.records);
     j.at("time").get_to(rp.time);
 }
 
