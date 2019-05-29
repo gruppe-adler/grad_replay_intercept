@@ -41,14 +41,13 @@ namespace grad {
                 {8,"rgba(102,0,127,127)"},  // 8: CIVILIAN unconscious
                 {9,"rgba(178,153,0,127)"},  // 9: SIDEEMPTY unconscious
                 {10,"rgba(51,51,51,127)"},  // 10: dead unit
-                {11,"rgba(1,0,0,1)"}        // 11: funkwagen-red when sending, speciality for "breaking contact"
+                {11,"rgba(255,0,0,255)"}    // 11: funkwagen-red when sending, speciality for "breaking contact"
             };
 
             static inline std::vector<std::string> iconTypes {
-                "StaticMortar", "StaticWeapon", "ParachuteBase", "Tank", "Motorcycle", "Helicopter", "Plane", "Ship", "Truck_F", "Static", "Car", "Man"
+                "Land_DataTerminal_01_F", "StaticMortar", "StaticWeapon", "ParachuteBase", "Tank", "Motorcycle", "Helicopter", "Plane", "Ship", "Truck_F", "Static", "Car", "Man"
             };
             
-            Record() {};
             Record(std::string icon, int color, Position position, float direction, std::string name, std::string group, std::optional<Position> target);
             Record(types::auto_array<types::game_value> record, std::shared_ptr<Record> prevPtr);
         };
