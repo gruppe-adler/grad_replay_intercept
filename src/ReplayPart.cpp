@@ -16,7 +16,7 @@ ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::shared_
                 if (record) {
                     this->records.push_back(std::make_shared<Record>(replay[i].to_array(), record.value()));
                 }
-                else { // prev was <null>
+                else { // prev was <null> or not present
                     auto prevPrevReplayPart = this->prevReplayPart->prevReplayPart;
                     
                     while (prevPrevReplayPart != nullptr) { // Iterate back until a record is found
@@ -38,10 +38,16 @@ ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::shared_
                 this->records.push_back(std::make_shared<Record>(replay[i].to_array(), std::make_shared<Record>("", -1, Position(0, 0), -1.0f, "", "", std::nullopt)));
             }
         }
-        else { // 12.30
+        else { // daytime, for example 12.0066
             this->time = ReplayPart::convertDaytimeToString(replay[i]);
         }
-    }    
+    }
+    if (prevReplayPart && this->records.size() != prevReplayPart->records.size()) {
+        while (this->records.size() < prevReplayPart->records.size())
+        {
+            this->records.push_back(std::nullopt);
+        }
+    }
 };
 
 std::string ReplayPart::convertDaytimeToString(float daytime) {
