@@ -62,22 +62,6 @@ void intercept::pre_init() {
 }
 
 nl::json constructData(types::auto_array<types::game_value> rootArray) {
-    auto gradReplayConfig = sqf::config_entry(sqf::mission_config_file()) >> ("GRAD_replay");
-
-    auto precision = (int)sqf::get_number(gradReplayConfig >> ("precision"));
-
-    auto trackedSidesArr = sqf::get_array(gradReplayConfig >> ("trackedSides")).to_array();
-    auto trackedSides = std::vector<std::string>();
-    for (auto& trackedSide : trackedSidesArr) {
-        trackedSides.push_back(trackedSide);
-    }
-
-    auto stepsPerTick = (int)sqf::get_number(gradReplayConfig >> ("stepsPerTick"));
-    auto trackedVehicles = (bool)sqf::get_number(gradReplayConfig >> ("trackedVehicles"));
-    auto trackedAI = (bool)sqf::get_number(gradReplayConfig >> ("trackedAI"));
-    auto sendingChunkSize = (int)sqf::get_number(gradReplayConfig >> ("sendingChunkSize"));
-    auto trackShots = (bool)sqf::get_number(gradReplayConfig >> ("trackShots"));
-
     std::vector<std::shared_ptr<ReplayPart>> replayParts;
     replayParts.reserve(rootArray.size());
 
@@ -92,10 +76,8 @@ nl::json constructData(types::auto_array<types::game_value> rootArray) {
     auto result = nl::json();
 
     for (auto& replayPart : replayParts) {
-        result["replay"].push_back(*replayPart);
+        result.push_back(*replayPart);
     }
-    result["config"] = { {"precision", precision }, {"trackedSides", trackedSides}, {"stepsPerTick", stepsPerTick}, {"trackedVehicles", trackedVehicles},
-        {"trackedAI", trackedAI}, {"sendingChunkSize", sendingChunkSize}, {"trackShots", trackShots} };
 
     return result;
 }
@@ -117,6 +99,28 @@ game_value sendReplay(game_state& gs, SQFPar right_arg) {
         auto worldName = std::string(sqf::world_name());
         std::transform(worldName.begin(), worldName.end(), worldName.begin(), ::tolower);
         obj["worldName"] = worldName;
+
+        // Config
+        auto gradReplayConfig = sqf::config_entry(sqf::mission_config_file()) >> ("GRAD_replay");
+
+        auto precision = (int)sqf::get_number(gradReplayConfig >> ("precision"));
+
+        auto trackedSidesArr = sqf::get_array(gradReplayConfig >> ("trackedSides")).to_array();
+        auto trackedSides = std::vector<std::string>();
+        for (auto& trackedSide : trackedSidesArr) {
+            trackedSides.push_back(trackedSide);
+        }
+
+        auto stepsPerTick = (int)sqf::get_number(gradReplayConfig >> ("stepsPerTick"));
+        auto trackedVehicles = (bool)sqf::get_number(gradReplayConfig >> ("trackedVehicles"));
+        auto trackedAI = (bool)sqf::get_number(gradReplayConfig >> ("trackedAI"));
+        auto sendingChunkSize = (int)sqf::get_number(gradReplayConfig >> ("sendingChunkSize"));
+        auto trackShots = (bool)sqf::get_number(gradReplayConfig >> ("trackShots"));
+
+        obj["config"] = { {"precision", precision }, {"trackedSides", trackedSides}, {"stepsPerTick", stepsPerTick}, {"trackedVehicles", trackedVehicles},
+            {"trackedAI", trackedAI}, {"sendingChunkSize", sendingChunkSize}, {"trackShots", trackShots} };
+
+        // Replay
         obj["data"] = constructData(right_arg.to_array());
 
         // Needed only on Windows/NOP on everything else
@@ -130,6 +134,7 @@ game_value sendReplay(game_state& gs, SQFPar right_arg) {
 
                 const pn::Context::Ptr context(new pn::Context(pn::Context::CLIENT_USE, "rootcert.pem"));
                 pn::HTTPSClientSession session(uri.getHost(), uri.getPort(), context);
+                session.setTimeout(p::Timespan(60, 0));
 
                 pn::HTTPRequest request(pn::HTTPRequest::HTTP_POST, path, pn::HTTPMessage::HTTP_1_1);
                 pn::HTTPResponse response;
