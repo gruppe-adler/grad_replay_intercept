@@ -90,7 +90,7 @@ game_value sendReplay(game_state& gs, SQFPar right_arg) {
 #endif // !_DEBUG
         // Construct JSON Object
         auto obj = nl::json();
-        obj["missionName"] = sqf::mission_name();
+        obj["missionName"] = sqf::briefing_name();
         obj["date"] = timePointToString(missionStart);
 
         auto now = std::chrono::system_clock::now();
