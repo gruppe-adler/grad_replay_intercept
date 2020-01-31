@@ -18,11 +18,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 # POCO
 find_package(OpenSSL REQUIRED)
-if(MSVC)
-    find_package(Poco CONFIG REQUIRED Foundation Net NetSSLWin JSON)
-else()
-    find_package(Poco CONFIG REQUIRED Foundation Net NetSSL JSON)
-endif()
+find_package(Poco CONFIG REQUIRED Foundation Net NetSSL)
 
 # Boost
 set(Boost_USE_STATIC_LIBS ON)
@@ -57,11 +53,10 @@ set_target_properties(${INTERCEPT_PLUGIN_NAME} PROPERTIES PREFIX "")
 set_target_properties(${INTERCEPT_PLUGIN_NAME} PROPERTIES FOLDER "${CMAKE_PROJECT_NAME}")
 
 target_link_libraries(${INTERCEPT_PLUGIN_NAME} nlohmann_json nlohmann_json::nlohmann_json)
+target_link_libraries(${INTERCEPT_PLUGIN_NAME} Poco::JSON Poco::NetSSL Poco::Net Poco::Foundation)
 
 if(MSVC)
-    target_link_libraries(${INTERCEPT_PLUGIN_NAME} Poco::JSON Poco::NetSSLWin Poco::Net Poco::Foundation)
-else()
-    target_link_libraries(${INTERCEPT_PLUGIN_NAME} Poco::JSON Poco::NetSSL Poco::Net Poco::Foundation)
+    target_link_libraries(${INTERCEPT_PLUGIN_NAME} CRYPT32.LIB)
 endif()
 
 target_link_libraries(${INTERCEPT_PLUGIN_NAME} ${Boost_LIBRARIES})
