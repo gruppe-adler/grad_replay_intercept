@@ -4,13 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include <Poco/Net/HTTPSClientSession.h>
-#include <Poco/Net/HTTPRequest.h>
-#include <Poco/Net/HTTPResponse.h>
-#include <Poco/StreamCopier.h>
-#include <Poco/Path.h>
-#include <Poco/URI.h>
-#include <Poco/Exception.h>
+#include <cpr/cpr.h>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
@@ -26,10 +20,9 @@
 #include <memory>
 #include <algorithm>
 
-namespace nl = nlohmann;
+#define GRAD_REPLAY_USER_AGENT "grad_replay_intercept/0.3"
 
-namespace p = Poco;
-namespace pn = Poco::Net;
+namespace nl = nlohmann;
 
 namespace fs = std::filesystem;
 
@@ -57,7 +50,7 @@ int intercept::api_version() {
 void intercept::register_interfaces() {}
 
 void intercept::pre_init() {
-    intercept::sqf::diag_log("The grad_replay_intercept plugin is running!");
+    intercept::sqf::diag_log(sqf::text("[GRAD] (replay_intercept) INFO: Running"));
 }
 
 nl::json constructData(types::auto_array<types::game_value> rootArray) {
@@ -81,12 +74,16 @@ nl::json constructData(types::auto_array<types::game_value> rootArray) {
     return result;
 }
 
+void dumpReplayAsJson(const std::chrono::system_clock::time_point& now, const nlohmann::json& obj) {
+    auto path = std::string(timePointToString(now)).append(".json");
+    std::replace(path.begin(), path.end(), ':', '-');
+    std::ofstream o(basePath / path);
+    o << std::setw(4) << obj << std::endl;
+}
+
 game_value sendReplay(game_state& gs, SQFPar right_arg) {
 
-    // Yes, I'm scared
-#ifndef _DEBUG
     try {
-#endif // !_DEBUG
         // Construct JSON Object
         auto obj = nl::json();
         obj["missionName"] = sqf::briefing_name();
@@ -116,95 +113,73 @@ game_value sendReplay(game_state& gs, SQFPar right_arg) {
         auto sendingChunkSize = (int)sqf::get_number(gradReplayConfig >> ("sendingChunkSize"));
         auto trackShots = (bool)sqf::get_number(gradReplayConfig >> ("trackShots"));
 
-        obj["config"] = { {"precision", precision }, {"trackedSides", trackedSides}, {"stepsPerTick", stepsPerTick}, {"trackedVehicles", trackedVehicles},
-            {"trackedAI", trackedAI}, {"sendingChunkSize", sendingChunkSize}, {"trackShots", trackShots} };
+        obj["config"] = { 
+            {"precision", precision }, 
+            {"trackedSides", trackedSides}, 
+            {"stepsPerTick", stepsPerTick}, 
+            {"trackedVehicles", trackedVehicles},
+            {"trackedAI", trackedAI}, 
+            {"sendingChunkSize", sendingChunkSize}, 
+            {"trackShots", trackShots} 
+        };
 
         // Replay
         obj["data"] = constructData(right_arg.to_array());
 
-        // Needed only on Windows/NOP on everything else
-        pn::initializeNetwork();
-
         std::thread sendReplayThread([obj, now]() {
             try
             {
-                p::URI uri(url);
-                std::string path(uri.getPathAndQuery());
-
-                const pn::Context::Ptr context(new pn::Context(pn::Context::CLIENT_USE, "rootcert.pem"));
-                pn::HTTPSClientSession session(uri.getHost(), uri.getPort(), context);
-                session.setTimeout(p::Timespan(60, 0));
-
-                pn::HTTPRequest request(pn::HTTPRequest::HTTP_POST, path, pn::HTTPMessage::HTTP_1_1);
-                pn::HTTPResponse response;
-
                 std::stringstream ss;
                 ss << obj;
 
-                request.setKeepAlive(false);
-                request.setContentLength(ss.str().size());
-                request.setContentType("application/json");
+                auto header = cpr::Header{
+                    {"Content-Type","application/json"},
+                    {"content-length", std::to_string(ss.str().size())},
+                    {"Connection", "close"},
+                    {"Authorization", std::string("Bearer ").append(token)},
+                    {"User-Agent", GRAD_REPLAY_USER_AGENT}
+                };
 
-                auto bearerToken = std::string("Bearer ").append(token);
+                cpr::Response response = cpr::Post(
+                    cpr::Url{ url },
+                    header,
+                    cpr::Body(ss.str()),
+                    cpr::Timeout(60000)
+                );
 
-                request.set("Authorization", bearerToken);
-                request.set("User-Agent", "grad_replay_intercept/0.1");
-
-                std::ostream& o = session.sendRequest(request);
-                o << obj;
-
-                session.receiveResponse(response);
-                /*
-                std::istream& is =
-                std::stringstream responseSStream;
-                p::StreamCopier::copyStream(is, responseSStream);
-                client::invoker_lock thread_lock;
-                sqf::diag_log(responseSStream.str());
-                */
-
-                if (response.getStatus() != pn::HTTPResponse::HTTPStatus::HTTP_CREATED) {
-                    auto path = std::string(timePointToString(now)).append(".json");
-                    std::replace(path.begin(), path.end(), ':', '-');
-                    std::ofstream o(basePath / path);
-                    o << std::setw(4) << obj << std::endl;
+                if (response.status_code != 201) {
+                    dumpReplayAsJson(now, obj);
                 }
 
                 std::stringstream responseLog;
-                responseLog << "[GRAD] (replay_intercept) INFO: POST Request Status " << response.getStatus() << " Reason " << response.getReason();
+                responseLog << "[GRAD] (replay_intercept) INFO: POST Request Status Code: " << response.status_code << " Request time: " << response.elapsed;
                 client::invoker_lock thread_lock;
-                sqf::diag_log(responseLog.str());
+                sqf::diag_log(sqf::text(responseLog.str()));
             }
-            catch (p::Exception& ex)
+            catch (std::exception& ex)
             {
-                auto path = std::string(timePointToString(now)).append(".json");
-                std::replace(path.begin(), path.end(), ':', '-');
-                std::ofstream o(basePath / path);
-                o << std::setw(4) << obj << std::endl;
+                dumpReplayAsJson(now, obj);
 
                 std::stringstream exceptionLog;
-                exceptionLog << "[GRAD] (replay_intercept) INFO: Exception during POST Request " << ex.displayText();
+                exceptionLog << "[GRAD] (replay_intercept) INFO: Exception during POST Request " << ex.what();
                 client::invoker_lock thread_lock;
-                sqf::diag_log(exceptionLog.str());
+                sqf::diag_log(sqf::text(exceptionLog.str()));
             }
         });
         sendReplayThread.detach();
-#ifndef _DEBUG
     }
     catch (std::exception& ex) {
         std::stringstream responseLog;
         responseLog << "[GRAD] (replay_intercept) CRASH: " << ex.what();
-        sqf::diag_log(responseLog.str());
+        sqf::diag_log(sqf::text(responseLog.str()));
     }
-#endif // !_DEBUG
     return true;
 }
 
 game_value startRecord() {
     missionStart = std::chrono::system_clock::now();
-    sqf::diag_log(timePointToString(missionStart));
     return true;
 }
-
 
 void intercept::pre_start() {
     
@@ -217,7 +192,7 @@ void intercept::pre_start() {
         token = pt.get<std::string>("Config.BearerToken");
     }
     catch (boost::property_tree::ini_parser_error ex) {
-        sqf::diag_log("grad_replay_intercept couldn't parse @grad_replay_intercept/config.ini, writing a new one");
+        sqf::diag_log(sqf::text("[GRAD] (replay_intercept) WARNING: Couldn't parse grad_replay_intercept_config.ini, writing a new one"));
         pt.add<std::string>("Config.ReplayUrl", "https://replay.gruppe-adler.de/");
         pt.add<std::string>("Config.BearerToken", "InsertYourBearerTokenHere");
         boost::property_tree::ini_parser::write_ini(path, pt);

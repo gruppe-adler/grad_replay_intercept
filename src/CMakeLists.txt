@@ -16,10 +16,8 @@ SOURCE_GROUP("src" FILES ${INTERCEPT_PLUGIN_SOURCES})
 # nlohmann json
 find_package(nlohmann_json CONFIG REQUIRED)
 
-# POCO
-set(OPENSSL_USE_STATIC_LIBS TRUE)
-find_package(OpenSSL REQUIRED)
-find_package(Poco CONFIG REQUIRED Foundation Net NetSSL)
+# CPR
+find_package(cpr CONFIG REQUIRED)
 
 # Boost
 set(Boost_USE_STATIC_LIBS ON)
@@ -54,7 +52,7 @@ set_target_properties(${INTERCEPT_PLUGIN_NAME} PROPERTIES PREFIX "")
 set_target_properties(${INTERCEPT_PLUGIN_NAME} PROPERTIES FOLDER "${CMAKE_PROJECT_NAME}")
 
 target_link_libraries(${INTERCEPT_PLUGIN_NAME} nlohmann_json nlohmann_json::nlohmann_json)
-target_link_libraries(${INTERCEPT_PLUGIN_NAME} Poco::NetSSL Poco::Net Poco::Foundation)
+target_link_libraries(${INTERCEPT_PLUGIN_NAME} cpr)
 
 if(MSVC)
     target_link_libraries(${INTERCEPT_PLUGIN_NAME} CRYPT32.LIB)
