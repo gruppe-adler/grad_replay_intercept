@@ -1,8 +1,0 @@
-{
-    "name": "replay_intercept",
-    "prefix": "grad",
-    "author": "Gruppe Adler",
-    "files": [
-        "mod.cpp"
-    ]
-}

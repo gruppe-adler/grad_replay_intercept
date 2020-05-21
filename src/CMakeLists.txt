@@ -17,6 +17,7 @@ SOURCE_GROUP("src" FILES ${INTERCEPT_PLUGIN_SOURCES})
 find_package(nlohmann_json CONFIG REQUIRED)
 
 # POCO
+set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 find_package(Poco CONFIG REQUIRED Foundation Net NetSSL)
 
@@ -53,7 +54,7 @@ set_target_properties(${INTERCEPT_PLUGIN_NAME} PROPERTIES PREFIX "")
 set_target_properties(${INTERCEPT_PLUGIN_NAME} PROPERTIES FOLDER "${CMAKE_PROJECT_NAME}")
 
 target_link_libraries(${INTERCEPT_PLUGIN_NAME} nlohmann_json nlohmann_json::nlohmann_json)
-target_link_libraries(${INTERCEPT_PLUGIN_NAME} Poco::JSON Poco::NetSSL Poco::Net Poco::Foundation)
+target_link_libraries(${INTERCEPT_PLUGIN_NAME} Poco::NetSSL Poco::Net Poco::Foundation)
 
 if(MSVC)
     target_link_libraries(${INTERCEPT_PLUGIN_NAME} CRYPT32.LIB)
@@ -69,5 +70,7 @@ else()
     set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /Zi /Ob0 /Od /RTC1 /MP /EHsc")
     set(CMAKE_CXX_FLAGS_RELEASE "/MT /Zi /O2 /Ob1 /EHsc /MP") #with debug info
     set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:LIBCMT") # LIBCMT conflicts with POCO
-    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "/OPT:REF /DEBUG:FULL /NODEFAULTLIB:LIBCMT") 
+    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "/OPT:REF /DEBUG:FULL") 
 endif()
+
+install(TARGETS ${INTERCEPT_PLUGIN_NAME} RUNTIME DESTINATION bin)

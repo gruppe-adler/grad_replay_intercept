@@ -1,0 +1,10 @@
+name = "replay_intercept"
+prefix = "grad"
+author = "Gruppe Adler"
+folder_optionals = false
+files = [
+    "mod.cpp",
+    "Adler.paa",
+    "LICENSE",
+    "README.md"
+]
