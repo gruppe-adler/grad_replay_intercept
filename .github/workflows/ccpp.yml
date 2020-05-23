@@ -32,7 +32,14 @@ jobs:
             cmakeArgs: '-DCMAKE_BUILD_TYPE=Release'
             installPath: 'install/lib/'
 
-    steps:    
+    steps:
+    - name: Use gcc-9/g++-9 on ubuntu
+      run: |
+        echo "::set-env name=CC::gcc-9"
+        echo "::set-env name=CXX::g++-9"
+      shell: bash
+      if: matrix.os == 'ubuntu-latest'
+      
     - uses: actions/checkout@v1
       with:
         submodules: true
