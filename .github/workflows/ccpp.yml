@@ -1,0 +1,67 @@
+name: C/C++ CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  job_build_cpp:
+    name: ${{ matrix.os }}-${{ matrix.buildConfig }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            buildConfig: release
+            displayName: grad_replay_intercept_windows
+            triplet: x64-windows-static
+            vcpkgCommitId: 'c4937039b0704c711dff11ffa729f1c105b20e42'
+            vcpkgPackages: 'nlohmann-json boost-program-options boost-property-tree cpr'
+            configuration: 'x64.*'
+            cmakeArgs: '-DCMAKE_BUILD_TYPE=Release'
+            installPath: 'install/bin/' 
+          - os: ubuntu-latest
+            buildConfig: release
+            displayName: grad_replay_intercept_ubuntu
+            triplet: x64-linux
+            vcpkgCommitId: 'c4937039b0704c711dff11ffa729f1c105b20e42'
+            vcpkgPackages: 'nlohmann-json boost-program-options boost-property-tree cpr'
+            configuration: 'x64.*'
+            cmakeArgs: '-DCMAKE_BUILD_TYPE=Release'
+            installPath: 'install/lib/'
+
+    steps:    
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - uses: lukka/get-cmake@master
+    - name: dir
+      run: find $RUNNER_WORKSPACE
+      shell: bash
+    - name: Restore artifacts, or Run vcpkg, build and cache artifacts
+      uses: lukka/run-vcpkg@v2
+      id: runvcpkg
+      with:
+        vcpkgArguments: '${{ matrix.vcpkgPackages }}'
+        vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
+        vcpkgTriplet: '${{ matrix.triplet }}'
+        vcpkgGitCommitId: '${{ matrix.vcpkgCommitId }}'
+
+    - name: Run CMake+Ninja
+      uses: lukka/run-cmake@v2
+      id: runcmake
+      with:
+        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+        cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+        useVcpkgToolchainFile: true
+        buildWithCMakeArgs: ' -- install -v'
+        buildDirectory: '${{ runner.workspace }}/b/ninja/'
+        cmakeAppendedArgs: '-G Ninja ${{ matrix.cmakeArgs }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install'
+        
+    - uses: actions/upload-artifact@v1
+      with:
+        name: ${{ matrix.os }}-${{ matrix.displayName }}
+        path: ${{ matrix.installPath }}
