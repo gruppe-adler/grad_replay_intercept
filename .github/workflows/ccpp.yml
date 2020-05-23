@@ -70,5 +70,5 @@ jobs:
         
     - uses: actions/upload-artifact@v1
       with:
-        name: ${{ matrix.os }}-${{ matrix.displayName }}
+        name: ${{ matrix.displayName }}
         path: ${{ matrix.installPath }}
