@@ -1,5 +1,5 @@
 class CfgPatches {
-    class grad_replay_intercept {
+    class grad_replay_intercept_main {
         name = "Gruppe Adler Replay Intercept Client";
         units[] = {};
         weapons[] = {};
