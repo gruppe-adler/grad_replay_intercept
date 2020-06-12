@@ -31,14 +31,14 @@
 *.out
 *.app
 
-# Arma Addons
+# Arma
 *.pbo
+*.biprivatekey
+keys/*
 
 # HEMTT
-!tools/hemtt.exe
-!tools/hemtt
-releases/
-keys/
+.hemtt/local
+releases/*
 
 # Others
 .vs
