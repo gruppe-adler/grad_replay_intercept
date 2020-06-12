@@ -21,7 +21,7 @@ jobs:
             vcpkgPackages: 'nlohmann-json boost-program-options boost-property-tree cpr'
             configuration: 'x64.*'
             cmakeArgs: '-DCMAKE_BUILD_TYPE=Release'
-            installPath: 'install/bin/' 
+            installPath: 'install/bin/'
           - os: ubuntu-latest
             buildConfig: release
             displayName: grad_replay_intercept_ubuntu
@@ -39,7 +39,7 @@ jobs:
         echo "::set-env name=CXX::g++-9"
       shell: bash
       if: matrix.os == 'ubuntu-latest'
-      
+
     - uses: actions/checkout@v1
       with:
         submodules: true
@@ -67,8 +67,12 @@ jobs:
         buildWithCMakeArgs: ' -- install -v'
         buildDirectory: '${{ runner.workspace }}/b/ninja/'
         cmakeAppendedArgs: '-G Ninja ${{ matrix.cmakeArgs }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install'
-        
+
+    - uses: gruppe-adler/action-release-with-hemtt@1.0
+      name: 'Build Mod with HEMTT'
+      id: build
+
     - uses: actions/upload-artifact@v1
       with:
         name: ${{ matrix.displayName }}
-        path: ${{ matrix.installPath }}
+        path: ${{ steps.build.outputs.zip_path }}
