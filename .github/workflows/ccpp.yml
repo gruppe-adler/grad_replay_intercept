@@ -71,10 +71,8 @@ jobs:
     - uses: gruppe-adler/action-release-with-hemtt@de4ae26
       name: 'Build Mod with HEMTT'
       id: build
-      with:
-        zip_build: false
 
     - uses: actions/upload-artifact@v1
       with:
         name: ${{ matrix.displayName }}
-        path: '${{ steps.build.outputs.release_path }}/*'
+        path: '${{ steps.build.outputs.zip_path }}/*'
