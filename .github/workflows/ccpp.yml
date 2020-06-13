@@ -68,9 +68,10 @@ jobs:
         buildDirectory: '${{ runner.workspace }}/b/ninja/'
         cmakeAppendedArgs: '-G Ninja ${{ matrix.cmakeArgs }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install'
 
-    - uses: gruppe-adler/action-release-with-hemtt@e1d07b4
+    - uses: gruppe-adler/action-release-with-hemtt@eb18617
       name: 'Build Mod with HEMTT'
       id: build
+      
 
     - name: Debug log zip_path
       run: |
