@@ -72,7 +72,19 @@ jobs:
       name: 'Build Mod with HEMTT'
       id: build
 
+    - name: Debug log zip_path
+      run: |
+        echo "zip_path: $TEST"
+      env:
+        TEST: ${{ steps.build.outputs.zip_path }}
+
+    - name: Debug log release_path
+      run: |
+        echo "release_path: $TEST"
+      env:
+        TEST: ${{ steps.build.outputs.release_path }}
+
     - uses: actions/upload-artifact@v1
       with:
         name: ${{ matrix.displayName }}
-        path: '${{ steps.build.outputs.zip_path }}/*'
+        path: '${{ steps.build.outputs.release_path }}/*'
