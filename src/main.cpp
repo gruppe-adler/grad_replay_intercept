@@ -92,9 +92,9 @@ game_value sendReplay(game_state& gs, SQFPar right_arg) {
         auto now = std::chrono::system_clock::now();
         obj["duration"] = std::chrono::duration_cast<std::chrono::seconds>(now - missionStart).count();
 
-        auto worldName = std::string(sqf::world_name());
-        std::transform(worldName.begin(), worldName.end(), worldName.begin(), ::tolower);
-        obj["worldName"] = worldName;
+        //auto worldName = std::string(sqf::world_name());
+        //std::transform(worldName.begin(), worldName.end(), worldName.begin(), ::tolower);
+        obj["worldName"] = sqf::world_name(); // worldName;
 
         // Config
         auto gradReplayConfig = sqf::config_entry(sqf::mission_config_file()) >> ("GRAD_replay");
