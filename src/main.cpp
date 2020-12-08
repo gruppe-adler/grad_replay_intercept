@@ -36,6 +36,21 @@ std::string token = "";
 std::chrono::system_clock::time_point missionStart;
 fs::path basePath;
 
+static inline std::map<int, std::string> defaultColorMap {
+    {0,"rgba(0, 0.3, 0.6, 1)"},     // 0: WEST
+    {1,"rgba(0.5, 0, 0, 1)"},       // 1: EAST
+    {2,"rgba(0, 0.5, 0, 1)"},       // 2: INDEPENDENT
+    {3,"rgba(0.4, 0, 0.5, 1)"},     // 3: CIVILIAN
+    {4,"rgba(0.7, 0.6, 0, 1)"},     // 4: SIDEEMPTY
+    {5,"rgba(0, 0.3, 0.6, 0.5)"},   // 5: WEST unconscious
+    {6,"rgba(0.5, 0, 0, 0.5)"},     // 6: EAST unconscious
+    {7,"rgba(0, 0.5, 0, 0.5)"},     // 7: INDEPENDENT unconscious
+    {8,"rgba(0.4, 0, 0.5, 0.5)"},   // 8: CIVILIAN unconscious
+    {9,"rgba(0.7, 0.6, 0, 0.5)"},   // 9: SIDEEMPTY unconscious
+    {10,"rgba(0.2, 0.2, 0.2, 0.5)"},// 10: dead unit
+    {11,"rgba(1, 0, 0, 1)"}         // 11: funkwagen-red when sending, speciality for "breaking contact"
+};
+
 std::string timePointToString(std::chrono::system_clock::time_point timePoint) {
     std::time_t missionStartInTimeT = std::chrono::system_clock::to_time_t(timePoint);
     std::stringstream timeStream;
@@ -53,25 +68,61 @@ void intercept::pre_init() {
     intercept::sqf::diag_log(sqf::text("[GRAD] (replay_intercept) INFO: Running"));
 }
 
-nl::json constructData(types::auto_array<types::game_value> rootArray) {
-    std::vector<std::shared_ptr<ReplayPart>> replayParts;
-    replayParts.reserve(rootArray.size());
-
-    std::shared_ptr<ReplayPart> prevReplayPart;
-
-    for (int i = 0; i < rootArray.size(); i++) {
-        auto replayPart = std::make_shared<ReplayPart>(rootArray[i].to_array(), prevReplayPart);
-        replayParts.push_back(replayPart);
-        prevReplayPart = replayPart;
+std::map<int, std::string> constructColorMap(types::auto_array<types::game_value> colorArray) {
+    // not sure why this is a map
+    std::map<int, std::string> colorMap;
+    for (size_t i = 0; i < colorArray.size(); i++)
+    {
+        auto rgba = colorArray[i].to_array();
+        std::stringstream rgbaStrStream;
+        rgbaStrStream << "rgba("
+            << (float_t)rgba[0] << ", "
+            << (float_t)rgba[1] << ", "
+            << (float_t)rgba[2] << ", "
+            << (float_t)rgba[3] << ")";
+        colorMap.insert({ i, rgbaStrStream.str() });
     }
+    return colorMap;
+}
 
-    auto result = nl::json();
+nl::json constructData(types::auto_array<types::game_value> parameters) {
 
-    for (auto& replayPart : replayParts) {
-        result.push_back(*replayPart);
+    if (parameters.size() == 2) {
+
+        std::map<int, std::string> colorMap;
+        if (parameters[1].is_nil()) {
+            client::invoker_lock thread_lock;
+            sqf::diag_log(sqf::text("[GRAD] (replay_intercept) WARNING: GRAD_REPLAY_COLORS is nil, using default colors!"));
+            colorMap = defaultColorMap;
+        }
+        else {
+            colorMap = constructColorMap(parameters[1].to_array());
+        }
+
+        types::auto_array rootArray = parameters[0].to_array();
+
+        std::vector<std::shared_ptr<ReplayPart>> replayParts;
+        replayParts.reserve(rootArray.size());
+
+        std::shared_ptr<ReplayPart> prevReplayPart;
+
+        for (int i = 0; i < rootArray.size(); i++) {
+            auto replayPart = std::make_shared<ReplayPart>(rootArray[i].to_array(), prevReplayPart, colorMap);
+            replayParts.push_back(replayPart);
+            prevReplayPart = replayPart;
+        }
+
+        auto result = nl::json();
+
+        for (auto& replayPart : replayParts) {
+            result.push_back(*replayPart);
+        }
+
+        return result;
     }
-
-    return result;
+    client::invoker_lock thread_lock;
+    sqf::diag_log(sqf::text("[GRAD] (replay_intercept) ERROR: Old syntax is no longer supported!"));
+    return nl::json();
 }
 
 void dumpReplayAsJson(const std::chrono::system_clock::time_point& now, const nlohmann::json& obj) {
@@ -212,7 +263,7 @@ void intercept::pre_start() {
 void intercept::post_init() {
     if ((bool)sqf::get_number(sqf::config_entry(sqf::mission_config_file()) >> ("GRAD_replay") >> ("upload"))) {
         startRecord();
-        sqf::call(sqf::compile("['GRAD_replay_stopped', { gradReplayInterceptSendReplay GRAD_REPLAY_DATABASE }] call CBA_fnc_addEventHandler"));
+        sqf::call(sqf::compile("['GRAD_replay_stopped', { gradReplayInterceptSendReplay [GRAD_REPLAY_DATABASE, GRAD_REPLAY_COLORS] }] call CBA_fnc_addEventHandler"));
     }
 }
 

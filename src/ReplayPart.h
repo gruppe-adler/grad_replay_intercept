@@ -22,7 +22,7 @@ namespace grad {
             std::string time;
             std::shared_ptr<ReplayPart> prevReplayPart;
 
-            ReplayPart(types::auto_array<types::game_value> replay, std::shared_ptr<ReplayPart> replayPart);
+            ReplayPart(types::auto_array<types::game_value> replay, std::shared_ptr<ReplayPart> replayPart, const std::map<int, std::string>& colorMap);
             static std::string convertDaytimeToString(float daytime);
         };
 

@@ -2,7 +2,7 @@
 
 using namespace grad::replay;
 
-ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::shared_ptr<ReplayPart> prevReplayPart) {
+ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::shared_ptr<ReplayPart> prevReplayPart, const std::map<int, std::string>& colorMap) {
     this->prevReplayPart = prevReplayPart;
 
     for (int i = 0; i < replay.size(); i++) {
@@ -14,7 +14,7 @@ ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::shared_
                 auto record = this->prevReplayPart->records[i];
 
                 if (record) {
-                    this->records.push_back(std::make_shared<Record>(replay[i].to_array(), record.value()));
+                    this->records.push_back(std::make_shared<Record>(replay[i].to_array(), record.value(), colorMap));
                 }
                 else { // prev was <null> or not present
                     auto prevPrevReplayPart = this->prevReplayPart->prevReplayPart;
@@ -24,7 +24,7 @@ ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::shared_
                             auto record = prevPrevReplayPart->records[i];
 
                             if (record) {
-                                this->records.push_back(std::make_shared<Record>(replay[i].to_array(), record.value()));
+                                this->records.push_back(std::make_shared<Record>(replay[i].to_array(), record.value(), colorMap));
                                 prevPrevReplayPart = nullptr;
                             }
                         }
@@ -35,7 +35,7 @@ ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::shared_
                 }
             }
             else {
-                this->records.push_back(std::make_shared<Record>(replay[i].to_array(), std::make_shared<Record>("", -1, Position(0, 0), -1.0f, "", "", std::nullopt)));
+                this->records.push_back(std::make_shared<Record>(replay[i].to_array(), std::make_shared<Record>("", -1, Position(0, 0), -1.0f, "", "", std::nullopt, colorMap), colorMap));
             }
         }
         else { // daytime, for example 12.0066
