@@ -37,6 +37,8 @@
 # HEMTT
 !tools/hemtt.exe
 !tools/hemtt
+releases/
+keys/
 
 # Others
 .vs
