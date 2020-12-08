@@ -2,7 +2,7 @@
 
 using namespace grad::replay;
 
-ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::shared_ptr<ReplayPart> prevReplayPart, const std::map<int, std::string>& colorMap) {
+ReplayPart::ReplayPart(types::auto_array<types::game_value> replay, std::shared_ptr<ReplayPart> prevReplayPart, const std::map<int, std::array<float_t, 4>>& colorMap) {
     this->prevReplayPart = prevReplayPart;
 
     for (int i = 0; i < replay.size(); i++) {

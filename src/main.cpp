@@ -36,19 +36,19 @@ std::string token = "";
 std::chrono::system_clock::time_point missionStart;
 fs::path basePath;
 
-static inline std::map<int, std::string> defaultColorMap {
-    {0,"rgba(0, 0.3, 0.6, 1)"},     // 0: WEST
-    {1,"rgba(0.5, 0, 0, 1)"},       // 1: EAST
-    {2,"rgba(0, 0.5, 0, 1)"},       // 2: INDEPENDENT
-    {3,"rgba(0.4, 0, 0.5, 1)"},     // 3: CIVILIAN
-    {4,"rgba(0.7, 0.6, 0, 1)"},     // 4: SIDEEMPTY
-    {5,"rgba(0, 0.3, 0.6, 0.5)"},   // 5: WEST unconscious
-    {6,"rgba(0.5, 0, 0, 0.5)"},     // 6: EAST unconscious
-    {7,"rgba(0, 0.5, 0, 0.5)"},     // 7: INDEPENDENT unconscious
-    {8,"rgba(0.4, 0, 0.5, 0.5)"},   // 8: CIVILIAN unconscious
-    {9,"rgba(0.7, 0.6, 0, 0.5)"},   // 9: SIDEEMPTY unconscious
-    {10,"rgba(0.2, 0.2, 0.2, 0.5)"},// 10: dead unit
-    {11,"rgba(1, 0, 0, 1)"}         // 11: funkwagen-red when sending, speciality for "breaking contact"
+static inline std::map<int, std::array<float_t, 4>> defaultColorMap {
+    {0, std::array<float_t, 4> {0, 0.3, 0.6, 1}},     // 0: WEST
+    {1, std::array<float_t, 4> {0.5, 0, 0, 1}},       // 1: EAST
+    {2, std::array<float_t, 4> {0, 0.5, 0, 1}},       // 2: INDEPENDENT
+    {3, std::array<float_t, 4> {0.4, 0, 0.5, 1}},     // 3: CIVILIAN
+    {4, std::array<float_t, 4> {0.7, 0.6, 0, 1}},     // 4: SIDEEMPTY
+    {5, std::array<float_t, 4> {0, 0.3, 0.6, 0.5}},   // 5: WEST unconscious
+    {6, std::array<float_t, 4> {0.5, 0, 0, 0.5}},     // 6: EAST unconscious
+    {7, std::array<float_t, 4> {0, 0.5, 0, 0.5}},     // 7: INDEPENDENT unconscious
+    {8, std::array<float_t, 4> {0.4, 0, 0.5, 0.5}},   // 8: CIVILIAN unconscious
+    {9, std::array<float_t, 4> {0.7, 0.6, 0, 0.5}},   // 9: SIDEEMPTY unconscious
+    {10, std::array<float_t, 4> {0.2, 0.2, 0.2, 0.5}},// 10: dead unit
+    {11, std::array<float_t, 4> {1, 0, 0, 1}}         // 11: funkwagen-red when sending, speciality for "breaking contact"
 };
 
 std::string timePointToString(std::chrono::system_clock::time_point timePoint) {
@@ -68,19 +68,13 @@ void intercept::pre_init() {
     intercept::sqf::diag_log(sqf::text("[GRAD] (replay_intercept) INFO: Running"));
 }
 
-std::map<int, std::string> constructColorMap(types::auto_array<types::game_value> colorArray) {
+std::map<int, std::array<float_t, 4>> constructColorMap(types::auto_array<types::game_value> colorArray) {
     // not sure why this is a map
-    std::map<int, std::string> colorMap;
+    std::map<int, std::array<float_t, 4>> colorMap;
     for (size_t i = 0; i < colorArray.size(); i++)
     {
         auto rgba = colorArray[i].to_array();
-        std::stringstream rgbaStrStream;
-        rgbaStrStream << "rgba("
-            << (float_t)rgba[0] << ", "
-            << (float_t)rgba[1] << ", "
-            << (float_t)rgba[2] << ", "
-            << (float_t)rgba[3] << ")";
-        colorMap.insert({ i, rgbaStrStream.str() });
+        colorMap.insert({ (int)i, { (float_t)rgba[0], (float_t)rgba[1], (float_t)rgba[2], (float_t)rgba[3]} });
     }
     return colorMap;
 }
@@ -89,7 +83,7 @@ nl::json constructData(types::auto_array<types::game_value> parameters) {
 
     if (parameters.size() == 2) {
 
-        std::map<int, std::string> colorMap;
+        std::map<int, std::array<float_t, 4>> colorMap;
         if (parameters[1].is_nil()) {
             client::invoker_lock thread_lock;
             sqf::diag_log(sqf::text("[GRAD] (replay_intercept) WARNING: GRAD_REPLAY_COLORS is nil, using default colors!"));
@@ -176,6 +170,10 @@ game_value sendReplay(game_state& gs, SQFPar right_arg) {
 
         // Replay
         obj["data"] = constructData(right_arg.to_array());
+
+        if (obj["data"].empty()) {
+            return false;
+        }
 
         std::thread sendReplayThread([obj, now]() {
             try

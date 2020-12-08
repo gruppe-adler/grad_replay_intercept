@@ -5,10 +5,10 @@ using namespace grad::replay;
 // ["iconMan",0,[1887.71,5696.76],0,"Willard"," (Alpha 1-1)",[123,456]]
 // TODO: handle case when prevPtr == nullptr
 
-Record::Record(std::string icon, int color, Position position, float direction, std::string name, std::string group, std::optional<Position> target, const std::map<int, std::string>& colorMap) :
+Record::Record(std::string icon, int color, Position position, float direction, std::string name, std::string group, std::optional<Position> target, const std::map<int, std::array<float_t, 4>>& colorMap) :
     icon(icon), color(color), position(position), direction(direction), name(name), group(group), target(target), colorMap(colorMap) {}
 
-Record::Record(types::auto_array<types::game_value> record, std::shared_ptr<Record> prevPtr, const std::map<int, std::string>& colorMap) : prevPtr(prevPtr), colorMap(colorMap) {
+Record::Record(types::auto_array<types::game_value> record, std::shared_ptr<Record> prevPtr, const std::map<int, std::array<float_t, 4>>& colorMap) : prevPtr(prevPtr), colorMap(colorMap) {
     this->icon = record[0].is_nil() ? this->prevPtr->icon : std::string(record[0]);
     this->color = record[1].is_nil() ? this->prevPtr->color : (int)record[1];
     
@@ -54,12 +54,12 @@ void grad::replay::to_json(nl::json& j, const Record& r)
         else if (icon == "Land_DataTerminal_01_F")
             icon = "radiounit";
     }
-    std::string color;
+    std::array<float_t, 4> color;
     if (r.colorMap.find(r.color) != r.colorMap.end()) {
         color = r.colorMap.at(r.color);
     }
     else {
-        color = "rgba(1, 1, 1, 1)";
+        color = { 1, 1, 1, 1 };
     }
     j = nl::json{ {"icon", icon} , {"color", color }, { "position", r.position },
         { "direction", r.direction }, { "name", r.name }, { "group", r.group }};
