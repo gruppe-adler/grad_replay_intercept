@@ -49,7 +49,7 @@ jobs:
       run: find $RUNNER_WORKSPACE
       shell: bash
     - name: Restore artifacts, or Run vcpkg, build and cache artifacts
-      uses: lukka/run-vcpkg@v2
+      uses: lukka/run-vcpkg@v6
       id: runvcpkg
       with:
         vcpkgArguments: '${{ matrix.vcpkgPackages }}'
@@ -58,7 +58,7 @@ jobs:
         vcpkgGitCommitId: '${{ matrix.vcpkgCommitId }}'
 
     - name: Run CMake+Ninja
-      uses: lukka/run-cmake@v2
+      uses: lukka/run-cmake@v3
       id: runcmake
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
