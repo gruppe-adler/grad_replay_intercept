@@ -17,7 +17,7 @@ jobs:
             buildConfig: release
             displayName: grad_replay_intercept_windows
             triplet: x64-windows-static
-            vcpkgCommitId: 'c4937039b0704c711dff11ffa729f1c105b20e42'
+            vcpkgCommitId: 'acb6b10e7fdf5e8519c18398d0b069e1d58ca025'
             vcpkgPackages: 'nlohmann-json boost-program-options boost-property-tree cpr'
             configuration: 'x64.*'
             cmakeArgs: '-DCMAKE_BUILD_TYPE=Release'
@@ -26,7 +26,7 @@ jobs:
             buildConfig: release
             displayName: grad_replay_intercept_ubuntu
             triplet: x64-linux
-            vcpkgCommitId: 'c4937039b0704c711dff11ffa729f1c105b20e42'
+            vcpkgCommitId: 'acb6b10e7fdf5e8519c18398d0b069e1d58ca025'
             vcpkgPackages: 'nlohmann-json boost-program-options boost-property-tree cpr'
             configuration: 'x64.*'
             cmakeArgs: '-DCMAKE_BUILD_TYPE=Release'
@@ -35,8 +35,8 @@ jobs:
     steps:
     - name: Use gcc-9/g++-9 on ubuntu
       run: |
-        echo "::set-env name=CC::gcc-9"
-        echo "::set-env name=CXX::g++-9"
+        echo "CC=gcc-9" >> $GITHUB_ENV
+        echo "CXX=g++-9" >> $GITHUB_ENV
       shell: bash
       if: matrix.os == 'ubuntu-latest'
 
