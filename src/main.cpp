@@ -54,7 +54,7 @@ static inline std::map<int, std::array<float_t, 4>> defaultColorMap {
 std::string timePointToString(std::chrono::system_clock::time_point timePoint) {
     std::time_t missionStartInTimeT = std::chrono::system_clock::to_time_t(timePoint);
     std::stringstream timeStream;
-    timeStream << std::put_time(std::localtime(&missionStartInTimeT), "%F %T");
+    timeStream << std::put_time(std::gmtime(&missionStartInTimeT), "%F %T");
     return timeStream.str();
 }
 

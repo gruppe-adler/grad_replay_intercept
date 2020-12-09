@@ -54,6 +54,11 @@ void grad::replay::to_json(nl::json& j, const Record& r)
         else if (icon == "Land_DataTerminal_01_F")
             icon = "radiounit";
     }
+    else {
+        client::invoker_lock thread_lock;
+        sqf::diag_log(sqf::text("[GRAD] (replay_intercept) WARNING: Couldn't find iconTyp for: " + r.icon));
+    }
+
     std::array<float_t, 4> color;
     if (r.colorMap.find(r.color) != r.colorMap.end()) {
         color = r.colorMap.at(r.color);
