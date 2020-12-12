@@ -20,16 +20,15 @@
 #include <memory>
 #include <algorithm>
 
-#define GRAD_REPLAY_USER_AGENT "grad_replay_intercept/0.3"
 #include "../addons/main/script_version.hpp"
+static inline std::string GRAD_REPLAY_USER_AGENT = "grad_replay_intercept/" +
+    std::to_string(MAJOR) + "." + std::to_string(MINOR) + "." + std::to_string(PATCHLVL) + "." + std::to_string(BUILD);
 
 namespace nl = nlohmann;
-
 namespace fs = std::filesystem;
 
 using namespace intercept;
 using namespace grad::replay;
-
 using SQFPar = game_value_parameter;
 
 std::string url = "";
