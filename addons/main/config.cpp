@@ -1,20 +1,19 @@
+#include "script_component.hpp"
+
 class CfgPatches {
     class grad_replay_intercept_main {
         name = "Gruppe Adler Replay Intercept Client";
         units[] = {};
         weapons[] = {};
-        requiredVersion = 1.82;
+        requiredVersion = 1.92;
         requiredAddons[] = {"intercept_core"};
-        author = "Willard";
-        authors[] = {"Willard"};
-        url = "https://github.com/gruppe-adler";
-        version = "1.0";
-        versionStr = "1.0";
-        versionAr[] = {1,0};
+        authors[] = { "Willard" };
+        url = "https://github.com/gruppe-adler/grad_replay_intercept";
+        VERSION_CONFIG;
     };
 };
 class Intercept {
-    class Willard {
+    class grad {
         class grad_replay_intercept {
             pluginName = "grad_replay_intercept";
         };

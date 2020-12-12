@@ -17,19 +17,13 @@ jobs:
             buildConfig: release
             displayName: grad_replay_intercept_windows
             triplet: x64-windows-static
-            vcpkgCommitId: 'acb6b10e7fdf5e8519c18398d0b069e1d58ca025'
-            vcpkgPackages: 'nlohmann-json boost-program-options boost-property-tree cpr'
             configuration: 'x64.*'
-            cmakeArgs: '-DCMAKE_BUILD_TYPE=Release'
             installPath: 'install/bin/'
           - os: ubuntu-latest
             buildConfig: release
             displayName: grad_replay_intercept_ubuntu
             triplet: x64-linux
-            vcpkgCommitId: 'acb6b10e7fdf5e8519c18398d0b069e1d58ca025'
-            vcpkgPackages: 'nlohmann-json boost-program-options boost-property-tree cpr'
             configuration: 'x64.*'
-            cmakeArgs: '-DCMAKE_BUILD_TYPE=Release'
             installPath: 'install/lib/'
 
     steps:
@@ -40,52 +34,76 @@ jobs:
       shell: bash
       if: matrix.os == 'ubuntu-latest'
 
-    - uses: actions/checkout@v1
+    # Checkout
+    - uses: actions/checkout@v2
       with:
         submodules: true
+        fetch-depth: 0
 
-    - uses: lukka/get-cmake@master
-    - name: dir
-      run: find $RUNNER_WORKSPACE
-      shell: bash
+    # Install latest CMake
+    - uses: lukka/get-cmake@latest
+
+    # Setup vcpkg and build deps
     - name: Restore artifacts, or Run vcpkg, build and cache artifacts
-      uses: lukka/run-vcpkg@v6
+      uses: lukka/run-vcpkg@v5
       id: runvcpkg
       with:
-        vcpkgArguments: '${{ matrix.vcpkgPackages }}'
-        vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
+        #setupOnly: true
+        vcpkgDirectory: '${{ github.workspace }}/vcpkg'
         vcpkgTriplet: '${{ matrix.triplet }}'
-        vcpkgGitCommitId: '${{ matrix.vcpkgCommitId }}'
+        vcpkgArguments: 'nlohmann-json boost-program-options boost-property-tree cpr'
+        vcpkgGitCommitId: 'acb6b10e7fdf5e8519c18398d0b069e1d58ca025'
 
+    # Build with CMake and Ninja
     - name: Run CMake+Ninja
       uses: lukka/run-cmake@v3
       id: runcmake
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-        useVcpkgToolchainFile: true
         buildWithCMakeArgs: ' -- install -v'
         buildDirectory: '${{ runner.workspace }}/b/ninja/'
-        cmakeAppendedArgs: '-G Ninja ${{ matrix.cmakeArgs }} -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install'
+        cmakeAppendedArgs: '-G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install'
+        useVcpkgToolchainFile: true
+        buildWithCMake: true
 
+    # Build the mod
     - uses: gruppe-adler/action-release-with-hemtt@60f7195
       name: 'Build Mod with HEMTT'
       id: build
-      
 
-    - name: Debug log zip_path
-      run: |
-        echo "zip_path: $TEST"
-      env:
-        TEST: ${{ steps.build.outputs.zip_path }}
-
-    - name: Debug log release_path
-      run: |
-        echo "release_path: $TEST"
-      env:
-        TEST: ${{ steps.build.outputs.release_path }}
-
+    # Upload the mod
     - uses: actions/upload-artifact@v1
       with:
         name: ${{ matrix.displayName }}
         path: ${{ steps.build.outputs.release_path }}
+
+  job_release:
+    runs-on: windows-latest
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    needs: [job_build_cpp]
+    steps:
+      # Download the build mod
+      - name: Download windows build
+        uses: actions/download-artifact@v2
+        with:
+          name: grad_replay_intercept_windows
+      - name: Download ubuntu build
+        uses: actions/download-artifact@v2
+        with:
+          name: grad_replay_intercept_ubuntu
+
+      # zip it
+      - uses: papeloto/action-zip@v1
+        with:
+          files: \@grad_replay_intercept/
+          dest: \@grad_replay_intercept.zip
+
+      # release it
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: true
+          files: |
+            \@grad_replay_intercept.zip
+
