@@ -281,7 +281,7 @@ Resulting JSON from grad_replay_intercept:
             "time": "12:00:15"
         }
     ]
-    "worldName": "stratis"
+    "worldName": "Stratis"
 }
 ```
 To find out more about the replay data structure check out [grad-replay#20](https://github.com/gruppe-adler/grad-replay/pull/20)
