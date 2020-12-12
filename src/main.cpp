@@ -22,6 +22,11 @@
 
 #define GRAD_REPLAY_USER_AGENT "grad_replay_intercept/0.3"
 
+#ifndef __GRAD_REPLAY_INTERCEPT_VERSION_HEADER__
+#define __GRAD_REPLAY_INTERCEPT_VERSION_HEADER__
+#include "../addons/main/script_version.hpp"
+#endif
+
 namespace nl = nlohmann;
 
 namespace fs = std::filesystem;
@@ -65,7 +70,12 @@ int intercept::api_version() {
 void intercept::register_interfaces() {}
 
 void intercept::pre_init() {
-    intercept::sqf::diag_log(sqf::text("[GRAD] (replay_intercept) INFO: Running"));
+
+    std::stringstream strVersion;
+    strVersion << "[GRAD] (replay_intercept) INFO: Running (";
+    strVersion << MAJOR << "." << MINOR << "." << PATCHLVL << "." << BUILD << ")";
+
+    intercept::sqf::diag_log(sqf::text(strVersion.str()));
 }
 
 std::map<int, std::array<float_t, 4>> constructColorMap(types::auto_array<types::game_value> colorArray) {
