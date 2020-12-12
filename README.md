@@ -18,7 +18,7 @@ The config file `grad_replay_intercept_config.ini` is located in the Arma 3 root
 
 * `Config.ReplayUrl` which holds the URL to the [replay.gruppe-adler.de](https://github.com/gruppe-adler/replay.gruppe-adler.de) API
 * `Config.BearerToken` which holds the authorization token
-  
+
 Example:
 
 ```ini
@@ -79,155 +79,205 @@ Resulting JSON from grad_replay_intercept:
 ```jsonc
 {
     "config": {
-        "precision": 1, 
-        "sendingChunkSize": 10, 
-        "stepsPerTick": 1, 
-        "trackShots": true, 
-        "trackedAI": true, 
+        "precision": 1,
+        "sendingChunkSize": 10,
+        "stepsPerTick": 1,
+        "trackShots": true,
+        "trackedAI": true,
         "trackedSides": [
-            "west", 
-            "east", 
+            "west",
+            "east",
             "civilian"
         ],
         "trackedVehicles": true
-    }, 
-    "date": "2019-05-23 15:07:30", 
-    "duration": 119, 
-    "missionName": "replayTest", 
+    },
+    "date": "2019-05-23 15:07:30",
+    "duration": 119,
+    "missionName": "replayTest",
     "data": [
         {
             "data": [
                 {
-                    "color": "rgba(0,76,153,1)", 
-                    "direction": 52.0, 
-                    "group": " (Alpha 1-1)", 
-                    "icon": "iconMan", 
-                    "name": "Dylan Lee", 
+                    "color": [
+                        0,
+                        0.3,
+                        0.6
+                        1
+                    ],
+                    "direction": 52.0,
+                    "group": " (Alpha 1-1)",
+                    "icon": "iconMan",
+                    "name": "Dylan Lee",
                     "position": [
-                        14701.0, 
+                        14701.0,
                         16740.599609375
                     ]
                 }
-            ], 
+            ],
             "time": "12:00:07"
-        }, 
+        },
         {
             "data": [
                 {
-                    "color": "rgba(0,76,153,1)", 
-                    "direction": 50.0, 
-                    "group": " (Alpha 1-1)", 
-                    "icon": "iconMan", 
-                    "name": "Dylan Lee", 
+                    "color": [
+                        0,
+                        0.3,
+                        0.6
+                        1
+                    ],
+                    "direction": 50.0,
+                    "group": " (Alpha 1-1)",
+                    "icon": "iconMan",
+                    "name": "Dylan Lee",
                     "position": [
-                        14716.599609375, 
+                        14716.599609375,
                         16756.099609375
                     ]
                 }
-            ], 
+            ],
             "time": "12:00:08"
-        }, 
+        },
         {
             "data": [
                 {
-                    "color": "rgba(0,76,153,1)", 
-                    "direction": 42.0, 
-                    "group": " (Alpha 1-1)", 
-                    "icon": "iconMan", 
-                    "name": "Dylan Lee", 
+                    "color": [
+                        0,
+                        0.3,
+                        0.6
+                        1
+                    ],
+                    "direction": 42.0,
+                    "group": " (Alpha 1-1)",
+                    "icon": "iconMan",
+                    "name": "Dylan Lee",
                     "position": [
-                        14733.7001953125, 
+                        14733.7001953125,
                         16773.599609375
                     ]
-                }, 
+                },
                 {
-                    "color": "rgba(0,76,153,1)", 
-                    "direction": 71.0, 
-                    "group": " (Alpha 1-2)", 
-                    "icon": "iconMan", 
-                    "name": "Oscar Carter", 
+                    "color": [
+                        0,
+                        0.3,
+                        0.6
+                        1
+                    ],
+                    "direction": 71.0,
+                    "group": " (Alpha 1-2)",
+                    "icon": "iconMan",
+                    "name": "Oscar Carter",
                     "position": [
-                        14679.099609375, 
+                        14679.099609375,
                         16692.19921875
                     ]
                 }
-            ], 
+            ],
             "time": "12:00:10"
-        }, 
+        },
         {
             "data": [
                 {
-                    "color": "rgba(0,76,153,1)", 
-                    "direction": 44.0, 
-                    "group": " (Alpha 1-1)", 
-                    "icon": "iconMan", 
-                    "name": "Dylan Lee", 
+                    "color": [
+                        0,
+                        0.3,
+                        0.6
+                        1
+                    ],
+                    "direction": 44.0,
+                    "group": " (Alpha 1-1)",
+                    "icon": "iconMan",
+                    "name": "Dylan Lee",
                     "position": [
-                        14751.5, 
+                        14751.5,
                         16791.5
                     ]
-                }, 
+                },
                 {
-                    "color": "rgba(0,76,153,1)", 
-                    "direction": 83.0, 
-                    "group": " (Alpha 1-2)", 
-                    "icon": "iconMan", 
-                    "name": "Oscar Carter", 
+                    "color": [
+                        0,
+                        0.3,
+                        0.6
+                        1
+                    ],
+                    "direction": 83.0,
+                    "group": " (Alpha 1-2)",
+                    "icon": "iconMan",
+                    "name": "Oscar Carter",
                     "position": [
-                        14700.2998046875, 
+                        14700.2998046875,
                         16692.19921875
                     ]
-                }, 
+                },
                 {
-                    "color": "rgba(0,76,153,1)", 
-                    "direction": 134.0, 
-                    "group": " (Alpha 1-3)", 
-                    "icon": "iconMan", 
-                    "name": "Oliver White", 
+                    "color": [
+                        0,
+                        0.3,
+                        0.6
+                        1
+                    ],
+                    "direction": 134.0,
+                    "group": " (Alpha 1-3)",
+                    "icon": "iconMan",
+                    "name": "Oliver White",
                     "position": [
-                        14660.099609375, 
+                        14660.099609375,
                         16688.900390625
                     ]
                 }
-            ], 
+            ],
             "time": "12:00:13"
-        }, 
+        },
         {
             "data": [
                 {
-                    "color": "rgba(0,76,153,1)", 
-                    "direction": 45.0, 
-                    "group": " (Alpha 1-1)", 
-                    "icon": "iconMan", 
-                    "name": "Dylan Lee", 
+                    "color": [
+                        0,
+                        0.3,
+                        0.6
+                        1
+                    ],
+                    "direction": 45.0,
+                    "group": " (Alpha 1-1)",
+                    "icon": "iconMan",
+                    "name": "Dylan Lee",
                     "position": [
-                        14769.400390625, 
+                        14769.400390625,
                         16809.400390625
                     ]
-                }, 
+                },
                 {
-                    "color": "rgba(0,76,153,1)", 
-                    "direction": 79.0, 
-                    "group": " (Alpha 1-2)", 
-                    "icon": "iconMan", 
-                    "name": "Oscar Carter", 
+                    "color": [
+                        0,
+                        0.3,
+                        0.6
+                        1
+                    ],
+                    "direction": 79.0,
+                    "group": " (Alpha 1-2)",
+                    "icon": "iconMan",
+                    "name": "Oscar Carter",
                     "position": [
-                        14722.7998046875, 
+                        14722.7998046875,
                         16692.400390625
                     ]
-                }, 
+                },
                 {
-                    "color": "rgba(0,76,153,1)", 
-                    "direction": 135.0, 
-                    "group": " (Alpha 1-3)", 
-                    "icon": "iconMan", 
-                    "name": "Oliver White", 
+                    "color": [
+                        0,
+                        0.3,
+                        0.6
+                        1
+                    ],
+                    "direction": 135.0,
+                    "group": " (Alpha 1-3)",
+                    "icon": "iconMan",
+                    "name": "Oliver White",
                     "position": [
-                        14677.7998046875, 
+                        14677.7998046875,
                         16670.900390625
                     ]
                 }
-            ], 
+            ],
             "time": "12:00:15"
         }
     ]
