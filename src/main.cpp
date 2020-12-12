@@ -21,11 +21,7 @@
 #include <algorithm>
 
 #define GRAD_REPLAY_USER_AGENT "grad_replay_intercept/0.3"
-
-#ifndef __GRAD_REPLAY_INTERCEPT_VERSION_HEADER__
-#define __GRAD_REPLAY_INTERCEPT_VERSION_HEADER__
 #include "../addons/main/script_version.hpp"
-#endif
 
 namespace nl = nlohmann;
 
