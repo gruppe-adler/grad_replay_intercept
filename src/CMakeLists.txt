@@ -28,7 +28,7 @@ find_package(cpr CONFIG REQUIRED)
 
 # Boost
 set(Boost_USE_STATIC_LIBS ON)
-FIND_PACKAGE(Boost 1.69 COMPONENTS program_options REQUIRED)
+FIND_PACKAGE(Boost 1.69 COMPONENTS program_options iostreams REQUIRED)
 
 #include the Intercept headers from the submodule
 set(INTERCEPT_CLIENT_PATH "${CMAKE_SOURCE_DIR}/intercept/src/client")

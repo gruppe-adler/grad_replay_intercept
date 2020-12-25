@@ -9,6 +9,11 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
+// Gzip
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -26,6 +31,7 @@ static inline std::string GRAD_REPLAY_USER_AGENT = "grad_replay_intercept/" +
 
 namespace nl = nlohmann;
 namespace fs = std::filesystem;
+namespace bi = boost::iostreams;
 
 using namespace intercept;
 using namespace grad::replay;
@@ -183,21 +189,30 @@ game_value sendReplay(game_state& gs, SQFPar right_arg) {
         std::thread sendReplayThread([obj, now]() {
             try
             {
-                std::stringstream ss;
-                ss << obj;
+                std::stringstream inputStream(obj.dump());
 
-                auto header = cpr::Header{
-                    {"Content-Type","application/json"},
-                    {"content-length", std::to_string(ss.str().size())},
-                    {"Connection", "close"},
-                    {"Authorization", std::string("Bearer ").append(token)},
-                    {"User-Agent", GRAD_REPLAY_USER_AGENT}
+                bi::filtering_istream fis;
+                fis.push(bi::gzip_compressor(bi::gzip_params(bi::gzip::best_compression)));
+                fis.push(inputStream);
+
+                std::stringstream outputStream;
+                bi::copy(fis, outputStream);
+
+                std::string outputString(outputStream.str());
+
+                auto header = cpr::Header {
+                    { "Content-Type", "application/json" },
+                    { "Content-Encoding", "gzip" },
+                    { "Content-Length", std::to_string(outputString.size()) },
+                    { "Connection", "close" },
+                    { "Authorization", std::string("Bearer ").append(token) },
+                    { "User-Agent", GRAD_REPLAY_USER_AGENT }
                 };
 
                 cpr::Response response = cpr::Post(
                     cpr::Url{ url },
                     header,
-                    cpr::Body(ss.str()),
+                    cpr::Body(outputString),
                     cpr::Timeout(60000)
                 );
 
