@@ -43,18 +43,18 @@ std::chrono::system_clock::time_point missionStart;
 fs::path basePath;
 
 static inline std::map<int, std::array<float_t, 4>> defaultColorMap {
-    {0, std::array<float_t, 4> {0, 0.3, 0.6, 1}},     // 0: WEST
-    {1, std::array<float_t, 4> {0.5, 0, 0, 1}},       // 1: EAST
-    {2, std::array<float_t, 4> {0, 0.5, 0, 1}},       // 2: INDEPENDENT
-    {3, std::array<float_t, 4> {0.4, 0, 0.5, 1}},     // 3: CIVILIAN
-    {4, std::array<float_t, 4> {0.7, 0.6, 0, 1}},     // 4: SIDEEMPTY
-    {5, std::array<float_t, 4> {0, 0.3, 0.6, 0.5}},   // 5: WEST unconscious
-    {6, std::array<float_t, 4> {0.5, 0, 0, 0.5}},     // 6: EAST unconscious
-    {7, std::array<float_t, 4> {0, 0.5, 0, 0.5}},     // 7: INDEPENDENT unconscious
-    {8, std::array<float_t, 4> {0.4, 0, 0.5, 0.5}},   // 8: CIVILIAN unconscious
-    {9, std::array<float_t, 4> {0.7, 0.6, 0, 0.5}},   // 9: SIDEEMPTY unconscious
-    {10, std::array<float_t, 4> {0.2, 0.2, 0.2, 0.5}},// 10: dead unit
-    {11, std::array<float_t, 4> {1, 0, 0, 1}}         // 11: funkwagen-red when sending, speciality for "breaking contact"
+    {0, std::array<float_t, 4> {0.0f, 0.3f, 0.6f, 1.0f}},   // 0: WEST
+    {1, std::array<float_t, 4> {0.5f, 0.0f, 0.0f, 1.0f}},   // 1: EAST
+    {2, std::array<float_t, 4> {0.0f, 0.5f, 0.0f, 1.0f}},   // 2: INDEPENDENT
+    {3, std::array<float_t, 4> {0.4f, 0.0f, 0.5f, 1.0f}},   // 3: CIVILIAN
+    {4, std::array<float_t, 4> {0.7f, 0.6f, 0.0f, 1.0f}},   // 4: SIDEEMPTY
+    {5, std::array<float_t, 4> {0.0f, 0.3f, 0.6f, 0.5f}},   // 5: WEST unconscious
+    {6, std::array<float_t, 4> {0.5f, 0.0f, 0.0f, 0.5f}},   // 6: EAST unconscious
+    {7, std::array<float_t, 4> {0.0f, 0.5f, 0.0f, 0.5f}},   // 7: INDEPENDENT unconscious
+    {8, std::array<float_t, 4> {0.4f, 0.0f, 0.5f, 0.5f}},   // 8: CIVILIAN unconscious
+    {9, std::array<float_t, 4> {0.7f, 0.6f, 0.0f, 0.5f}},   // 9: SIDEEMPTY unconscious
+    {10, std::array<float_t, 4> {0.2f, 0.2f, 0.2f, 0.5f}},  // 10: dead unit
+    {11, std::array<float_t, 4> {1.0f, 0.0f, 0.0f, 1.0f}}   // 11: funkwagen-red when sending, speciality for "breaking contact"
 };
 
 std::string timePointToString(std::chrono::system_clock::time_point timePoint) {
