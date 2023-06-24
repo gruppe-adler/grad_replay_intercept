@@ -42,6 +42,9 @@ jobs:
         submodules: true
         fetch-depth: 0
 
+    # Setup MSVC
+    - uses: ilammy/msvc-dev-cmd@v1
+
     # Install latest CMake
     - uses: lukka/get-cmake@latest
 
@@ -56,17 +59,17 @@ jobs:
         vcpkgGitCommitId: '1286cac8751e13bb289061b7e3b89eb4c3f613a2'
 
     # Build with CMake and Ninja
-    - name: Run CMake+Ninja
-      uses: lukka/run-cmake@v3
-      id: runcmake
-      with:
-        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-        cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-        buildWithCMakeArgs: ' -- install -v'
-        buildDirectory: '${{ runner.workspace }}/b/ninja/'
-        cmakeAppendedArgs: '-G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install'
-        useVcpkgToolchainFile: true
-        buildWithCMake: true
+    #- name: Run CMake+Ninja
+    #  uses: lukka/run-cmake@v3
+    #  id: runcmake
+    #  with:
+    #    cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+    #    cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+    #    buildWithCMakeArgs: ' -- install -v'
+    #    buildDirectory: '${{ runner.workspace }}/b/ninja/'
+    #    cmakeAppendedArgs: '-G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install'
+    #    useVcpkgToolchainFile: true
+    #    buildWithCMake: true
 
     - name: Run CMake consuming CMakePresets.json and vcpkg.json by mean of vcpkg.
       uses: lukka/run-cmake@v10
@@ -74,7 +77,7 @@ jobs:
         configurePreset: 'ninja-multi'
         configurePresetAdditionalArgs: "['-DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install']"
         buildPreset: 'ninja-multi'
-        buildPresetAdditionalArgs: "['--config Release', '-- install' ,'-v']"
+        buildPresetAdditionalArgs: "['--config Release', '--install ${{ github.workspace }}/install' ,'-v']"
 
     # Build the mod
     - uses: gruppe-adler/action-release-with-hemtt@60f7195e5240289fecd07c29cc5ec8fd92ad2159
