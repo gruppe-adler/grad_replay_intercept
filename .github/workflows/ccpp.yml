@@ -90,7 +90,7 @@ jobs:
     # Upload the mod
     - uses: actions/upload-artifact@v1
       with:
-        name: ${{needs.job_build_cpp.outputs.modName}}_${{ matrix.displayName }}
+        name: ${{ steps.build.outputs.mod_name }}_${{ matrix.displayName }}
         path: ${{ steps.build.outputs.release_path }}
 
   job_release:
