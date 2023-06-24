@@ -28,7 +28,9 @@ find_package(cpr CONFIG REQUIRED)
 
 # Boost
 set(Boost_USE_STATIC_LIBS ON)
-FIND_PACKAGE(Boost 1.69 COMPONENTS program_options iostreams REQUIRED)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME ON)
+FIND_PACKAGE(Boost 1.82.0 REQUIRED COMPONENTS program_options iostreams REQUIRED)
 
 #include the Intercept headers from the submodule
 set(INTERCEPT_CLIENT_PATH "${CMAKE_SOURCE_DIR}/intercept/src/client")
@@ -62,7 +64,7 @@ set_target_properties(${INTERCEPT_PLUGIN_NAME} PROPERTIES PREFIX "")
 set_target_properties(${INTERCEPT_PLUGIN_NAME} PROPERTIES FOLDER "${CMAKE_PROJECT_NAME}")
 
 target_link_libraries(${INTERCEPT_PLUGIN_NAME} nlohmann_json nlohmann_json::nlohmann_json)
-target_link_libraries(${INTERCEPT_PLUGIN_NAME} cpr)
+target_link_libraries(${INTERCEPT_PLUGIN_NAME} cpr::cpr)
 
 if(MSVC)
     target_link_libraries(${INTERCEPT_PLUGIN_NAME} CRYPT32.LIB)

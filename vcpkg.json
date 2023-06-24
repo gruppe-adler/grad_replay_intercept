@@ -1,0 +1,15 @@
+{
+  "name": "grad-replay-intercept",
+  "dependencies": [
+    "nlohmann-json",
+    "boost-program-options",
+    "boost-property-tree",
+    "boost-iostreams",
+    {
+      "name": "cpr",
+      "features": [
+        "ssl"
+      ]
+    }
+  ]
+}
