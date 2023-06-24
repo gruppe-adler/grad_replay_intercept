@@ -36,6 +36,21 @@
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       }
+    },
+    {
+      "name": "ninja-linux-vcpkg",
+      "displayName": "Ninja VCPKG on Linux",
+      "inherits": "ninja-multi-vcpkg",
+      "description": "Build using Ninja generator VCPKG on Linux",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
     }
   ]
 }

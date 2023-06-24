@@ -19,12 +19,14 @@ jobs:
             buildConfig: release
             displayName: grad_replay_intercept_windows
             triplet: x64-windows-static
+            preset: ninja-msvc-vcpkg
             configuration: 'x64.*'
             installPath: 'install/bin/'
           - os: ubuntu-latest
             buildConfig: release
             displayName: grad_replay_intercept_ubuntu
             triplet: x64-linux
+            preset: ninja-linux-vcpkg
             configuration: 'x64.*'
             installPath: 'install/lib/'
 
@@ -74,9 +76,9 @@ jobs:
     - name: Run CMake consuming CMakePresets.json and vcpkg.json by mean of vcpkg.
       uses: lukka/run-cmake@v10
       with:
-        configurePreset: 'ninja-multi'
+        configurePreset: ${{ matrix.preset }}
         configurePresetAdditionalArgs: "['-DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install']"
-        buildPreset: 'ninja-multi'
+        buildPreset: ${{ matrix.preset }}
         buildPresetAdditionalArgs: "['--config Release', '--install ${{ github.workspace }}/install' ,'-v']"
 
     # Build the mod
