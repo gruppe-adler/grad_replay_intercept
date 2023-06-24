@@ -79,7 +79,7 @@ jobs:
         configurePreset: ${{ matrix.preset }}
         configurePresetAdditionalArgs: "['-DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install']"
         buildPreset: ${{ matrix.preset }}
-        buildPresetAdditionalArgs: "['--config Release', '--target install,'-v']"
+        buildPresetAdditionalArgs: "['--config Release', '--target install','-v']"
 
     # Build the mod
     - uses: gruppe-adler/action-release-with-hemtt@60f7195e5240289fecd07c29cc5ec8fd92ad2159
