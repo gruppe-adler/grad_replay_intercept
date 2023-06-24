@@ -59,18 +59,36 @@
   ],
   "buildPresets": [
     {
-      "name": "ninja-msvc-vcpkg",
+      "name": "ninja-msvc-vcpkg-debug",
       "configurePreset": "ninja-msvc-vcpkg",
-      "displayName": "Build ninja-msvc-vcpkg",
-      "description": "Build ninja-msvc-vcpkg Configurations",
-      "targets": "install"
+      "displayName": "Build ninja-msvc-vcpkg (Debug)",
+      "description": "Build ninja-msvc-vcpkg (Debug) Configurations",
+      "targets": "install",
+      "configuration": "Debug"
     },
     {
-      "name": "ninja-linux-vcpkg",
+      "name": "ninja-linux-vcpkg-debug",
       "configurePreset": "ninja-linux-vcpkg",
-      "displayName": "Build ninja-linux-vcpkg",
+      "displayName": "Build ninja-linux-vcpkg (Debug)",
+      "description": "Build ninja-linux-vcpkg (Debug) Configurations",
+      "targets": "install",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ninja-msvc-vcpkg-release",
+      "configurePreset": "ninja-msvc-vcpkg",
+      "displayName": "Build ninja-msvc-vcpkg (Release)",
+      "description": "Build ninja-msvc-vcpkg Configurations",
+      "targets": "install",
+      "configuration": "Release"
+    },
+    {
+      "name": "ninja-linux-vcpkg-release",
+      "configurePreset": "ninja-linux-vcpkg",
+      "displayName": "Build ninja-linux-vcpkg (Release)",
       "description": "Build ninja-linux-vcpkg Configurations",
-      "targets": "install"
+      "targets": "install",
+      "configuration": "Release"
     }
   ]
 }

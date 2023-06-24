@@ -19,14 +19,14 @@ jobs:
             buildConfig: release
             displayName: grad_replay_intercept_windows
             triplet: x64-windows-static
-            preset: ninja-msvc-vcpkg
+            preset: ninja-msvc-vcpkg-release
             configuration: 'x64.*'
             installPath: 'install/bin/'
           - os: ubuntu-latest
             buildConfig: release
             displayName: grad_replay_intercept_ubuntu
             triplet: x64-linux
-            preset: ninja-linux-vcpkg
+            preset: ninja-linux-vcpkg-release
             configuration: 'x64.*'
             installPath: 'install/lib/'
 
@@ -78,7 +78,7 @@ jobs:
       with:
         configurePreset: ${{ matrix.preset }}
         buildPreset: ${{ matrix.preset }}
-        buildPresetAdditionalArgs: "['--config Release']"
+        #buildPresetAdditionalArgs: "['--config Release']"
 
     # Build the mod
     - uses: gruppe-adler/action-release-with-hemtt@60f7195e5240289fecd07c29cc5ec8fd92ad2159
