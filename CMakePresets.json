@@ -17,6 +17,10 @@
           "type": "FILEPATH",
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
         },
+        "CMAKE_INSTALL_PREFIX": {
+          "type": "FILEPATH",
+          "value": "${sourceDir}/install"
+        },
         "USE_64BIT_BUILD": true
       }
     },
@@ -51,6 +55,22 @@
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
       }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "ninja-msvc-vcpkg",
+      "configurePreset": "ninja-msvc-vcpkg",
+      "displayName": "Build ninja-msvc-vcpkg",
+      "description": "Build ninja-msvc-vcpkg Configurations",
+      "targets": "install"
+    },
+    {
+      "name": "ninja-linux-vcpkg",
+      "configurePreset": "ninja-linux-vcpkg",
+      "displayName": "Build ninja-linux-vcpkg",
+      "description": "Build ninja-linux-vcpkg Configurations",
+      "targets": "install"
     }
   ]
 }
