@@ -7,30 +7,35 @@
   },
   "configurePresets": [
     {
+      "name": "ninja-multi-vcpkg",
+      "displayName": "Ninja Multi-Config Configure Settings",
+      "description": "Configure with vcpkg toolchain",
+      "binaryDir": "${sourceDir}/builds/${presetName}",
+      "generator": "Ninja Multi-Config",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+        "USE_64BIT_BUILD": true
+      }
+    },
+    {
       "name": "ninja-msvc-vcpkg",
       "displayName": "Ninja MSVC VCPKG",
+      "inherits": "ninja-multi-vcpkg",
       "description": "Build using Ninja generator with MSVC and VCPKG",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/default",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
         "CMAKE_C_COMPILER": "cl",
-        "CMAKE_CXX_COMPILER": "cl",
-        "USE_64BIT_BUILD": true,
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+        "CMAKE_CXX_COMPILER": "cl"
       },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       }
-    },
-    {
-      "name": "ninja-multi",
-      //"inherits": "default",
-      "displayName": "Ninja Multi-Config",
-      "description": "Default build using Ninja Multi-Config generator",
-      "generator": "Ninja Multi-Config"
     }
   ]
 }
