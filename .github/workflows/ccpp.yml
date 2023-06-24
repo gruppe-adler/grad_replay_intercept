@@ -2,8 +2,6 @@ name: C/C++ CI
 
 on:
   push:
-    branches:
-      - 'ci'
   pull_request:
 
 jobs:
@@ -80,7 +78,7 @@ jobs:
 
   job_release:
     runs-on: windows-latest
-    #if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     needs: [job_build_cpp]
     steps:
       # Download the build mod
@@ -100,10 +98,10 @@ jobs:
           dest: \@${{needs.job_build_cpp.outputs.modName}}.zip
 
       # release it
-      #- uses: "marvinpinto/action-automatic-releases@latest"
-      #  with:
-      #    repo_token: "${{ secrets.GITHUB_TOKEN }}"
-      #    prerelease: true
-      #    files: |
-      #      \@${{needs.job_build_cpp.outputs.modName}}.zip
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: true
+          files: |
+            \@${{needs.job_build_cpp.outputs.modName}}.zip
 
