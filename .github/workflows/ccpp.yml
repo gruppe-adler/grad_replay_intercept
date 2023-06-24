@@ -10,6 +10,8 @@ jobs:
   job_build_cpp:
     name: ${{ matrix.os }}-${{ matrix.buildConfig }}
     runs-on: ${{ matrix.os }}
+    outputs:
+      modName: ${{ steps.build.outputs.mod_name }}
     strategy:
       fail-fast: false
       matrix:
@@ -17,14 +19,14 @@ jobs:
         include:
           - os: windows-latest
             buildConfig: release
-            displayName: grad_replay_intercept_windows
+            displayName: windows
             triplet: x64-windows-static
             preset: ninja-msvc-vcpkg
             configuration: 'x64.*'
             installPath: 'install/bin/'
           - os: ubuntu-latest
             buildConfig: release
-            displayName: grad_replay_intercept_ubuntu
+            displayName: ubuntu
             triplet: x64-linux
             preset: ninja-linux-vcpkg
             configuration: 'x64.*'
@@ -88,7 +90,7 @@ jobs:
     # Upload the mod
     - uses: actions/upload-artifact@v1
       with:
-        name: ${{ matrix.displayName }}
+        name: ${{needs.job_build_cpp.outputs.modName}}_${{ matrix.displayName }}
         path: ${{ steps.build.outputs.release_path }}
 
   job_release:
@@ -100,17 +102,17 @@ jobs:
       - name: Download windows build
         uses: actions/download-artifact@v2
         with:
-          name: grad_replay_intercept_windows
+          name: ${{needs.job_build_cpp.outputs.modName}}_windows
       - name: Download ubuntu build
         uses: actions/download-artifact@v2
         with:
-          name: grad_replay_intercept_ubuntu
+          name: ${{needs.job_build_cpp.outputs.modName}}_ubuntu
 
       # zip it
       - uses: papeloto/action-zip@v1
         with:
-          files: \@grad_replay_intercept/
-          dest: \@grad_replay_intercept.zip
+          files: \@${{needs.job_build_cpp.outputs.modName}}/
+          dest: \@${{needs.job_build_cpp.outputs.modName}}.zip
 
       # release it
       - uses: "marvinpinto/action-automatic-releases@latest"
@@ -118,5 +120,5 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: true
           files: |
-            \@grad_replay_intercept.zip
+            \@${{needs.job_build_cpp.outputs.modName}}.zip
 
